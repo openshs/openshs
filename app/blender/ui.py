@@ -24,26 +24,33 @@ class ActivityLayout(SimpleLayout):
     def __init__(self, sys, data):
         super().__init__(sys, data, name='ActivityFrame')
 
+        self.sleep_btn      = bgui.FrameButton(self.frame, text='sleep', size=[0.1, 0.05], pos=[0.90, 0.95])
+        self.eat_btn        = bgui.FrameButton(self.frame, text='eat', size=[0.1, 0.05], pos=[0.90, 0.90])
+        self.personal_btn   = bgui.FrameButton(self.frame, text='personal', size=[0.1, 0.05], pos=[0.90, 0.85])
+        self.work_btn       = bgui.FrameButton(self.frame, text='work', size=[0.1, 0.05], pos=[0.90, 0.80])
+        self.other_btn      = bgui.FrameButton(self.frame, text='other', size=[0.1, 0.05], pos=[0.90, 0.75])
+
         self.ok_btn = bgui.FrameButton(self.frame, text='Ok',
                 size=[0.3, 0.1], pos=[0, 0.2], options=bgui.BGUI_CENTERX)
 
         self.cancel_btn = bgui.FrameButton(self.frame, text='Cancel',
                 size=[0.3, 0.1], pos=[0, 0.1], options=bgui.BGUI_CENTERX)
 
-        self.activity_name_input = bgui.TextInput(self.frame, prefix="Activity Name: ", text='',
-                pt_size=30, size=[0.3, 0.05], options=bgui.BGUI_CENTERED)
-        self.activity_name = ''
-
         self.activity_duration_input = bgui.TextInput(self.frame, prefix="Activity Duration: ", text='0',
                 pt_size=30, pos=[0, 0.4], size=[0.3, 0.05], options=bgui.BGUI_CENTERX)
         self.activity_duration_input.visible = False
         self.activity_duration = 0
 
+        # signals
         self.ok_btn.on_click = self.ok_btn_click
         self.cancel_btn.on_click = self.cancel_btn_click
+        self.sleep_btn.on_click = self.set_activity_click
+        self.eat_btn.on_click = self.set_activity_click
+        self.personal_btn.on_click = self.set_activity_click
+        self.work_btn.on_click = self.set_activity_click
+        self.other_btn.on_click = self.set_activity_click
 
     def show(self):
-        self.activity_name_input.text = logic.states['Activity']
         self.frame.visible = True
         self.cam['mmc.mouselook'] = False
         self.actor['active'] = False
@@ -64,10 +71,11 @@ class ActivityLayout(SimpleLayout):
             self.activity_duration_input.visible = False
             self.activity_duration_input.text = '0'
 
+    def set_activity_click(self, widget):
+        logic.states['Activity'] = widget.text
+
     def ok_btn_click(self, widget):
-        self.activity_name = self.activity_name_input.text
         self.activity_duration = int(self.activity_duration_input.text)
-        logic.states['Activity'] = self.activity_name
         for i in range(self.activity_duration):
             logic.out.write(','.join([str(logic.states[i]) for i in sorted(logic.states.keys(), reverse=True)]) + '\n')
         self.activity_duration_input.visible = False
@@ -87,5 +95,4 @@ def main(cont):
         own['sys'].load_layout(ActivityLayout, None)
         mouse.visible = True
     else:
-        # print(own['sys'].children['1'].activity_duration)
         own['sys'].run()
