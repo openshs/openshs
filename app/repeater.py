@@ -1,6 +1,6 @@
 import csv
 from random import randint
-from math import floor
+from math import floor, ceil
 import sys
 
 
@@ -11,6 +11,8 @@ class Repeater():
     """
     def __init__(self, dataset, alpha=0, hasheader=True):
         try:
+            if alpha > 1.0 or alpha < 0:
+                raise TypeError
             self.alpha = alpha
             self.dataset = dataset
             self.data = [l for l in self.dataset]
@@ -20,8 +22,10 @@ class Repeater():
             self.pat_ts, self.pattern = self.extractPats()
             self.total_time = len(self.data)
             self.init_state = self.data[0]
+            self.last_margin = 0
         except TypeError:
-            print("Got wrong type. Expecting an iterable")
+            print("Type Error: dataset must be iterable and alpha must be less than 1 and greater than 0.")
+            sys.exit(-1)
 
     @staticmethod
     def diffLists(l1, l2):
@@ -52,13 +56,27 @@ class Repeater():
                 temp = row
         return ts, li
 
-    @staticmethod
-    def marginCalc(pat_idx, total_time, num_pats):
+    # @staticmethod
+    def marginCalc(self, pat_idx, total_time, num_pats):
         try:
-            bucket_size = (total_time // num_pats) - 1
-            left_margin = pat_idx % bucket_size
-            right_margin = bucket_size - left_margin - 1
-            return (left_margin, right_margin)
+            bucket_size = total_time // num_pats
+            sub_margin = bucket_size - floor(bucket_size * self.alpha)
+            bucket_size -= sub_margin
+            if self.last_margin == 0:
+                if sub_margin == 0:
+                    left_margin = self.last_margin
+                elif bucket_size == 0:
+                    left_margin = pat_idx
+                else:
+                    s = ceil(pat_idx / bucket_size)
+                    left_margin = pat_idx - s
+            else:
+                left_margin = self.last_margin
+
+            right_margin = left_margin + bucket_size
+            right_margin -= 1
+
+            return left_margin, right_margin
         except ZeroDivisionError:
             print("Error: Too many changes in the sensors and not enough data to generate new replications.")
             sys.exit(-1)
@@ -70,9 +88,15 @@ class Repeater():
         dist = []
         for pi in self.pat_ts:
             leftMargin, rightMargin = self.marginCalc(pi, self.total_time, num_pats)
-            leftMargin = floor(leftMargin * self.alpha)
-            rightMargin = floor(rightMargin * self.alpha)
-            dist.append(randint(pi - leftMargin, pi + rightMargin))
+            # print(str(pi) + " L=" + str(leftMargin) + " R=" + str(rightMargin))
+            # leftMargin = floor(leftMargin * self.alpha)
+            # rightMargin = floor(rightMargin * self.alpha)
+            # dist.append(randint(pi - leftMargin, pi + rightMargin))
+            if leftMargin >= rightMargin:
+                dist.append(pi)
+            else:
+                dist.append(randint(leftMargin, rightMargin))
+            self.last_margin = rightMargin + 1
         return dist
 
     def consData(self):
