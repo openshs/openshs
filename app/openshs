@@ -64,46 +64,46 @@ def main():
     pass
 
 @main.command()
-@click.option('--list-scenarios', '-ls', default=False, is_flag=True, help='Lists the available scenarios.')
-@click.option('--recorded-scenarios', '-rs', default=False, is_flag=True, help='Shows the status of the recorded scenarios.')
-def status(list_scenarios, recorded_scenarios):
+@click.option('--list-contexts', '-lc', default=False, is_flag=True, help='Lists the available contexts.')
+@click.option('--recorded-contexts', '-rs', default=False, is_flag=True, help='Shows the status of the recorded contexts.')
+def status(list_contexts, recorded_contexts):
     """Shows the current status of the experiment."""
-    if list_scenarios:
+    if list_contexts:
         click.echo(", ".join([x for x in SCENARIOS.keys()]))
 
-    if recorded_scenarios:
+    if recorded_contexts:
         for scenario in SCENARIOS:
-            click.echo("For scenario " + click.style(scenario, bold=True) + ":")
+            click.echo("For context " + click.style(scenario, bold=True) + ":")
             di = get_scenario_filenames(SCENARIOS[scenario]['dataset_path'])
             for k in sorted(di):
                 click.echo("\t" + k + " repeated: " + di[k])
 
 @main.command()
-@click.option('--scenario', '-s', type=click.Choice(list(SCENARIOS.keys())), help='Which scenario to start.')
+@click.option('--context', '-c', type=click.Choice(list(SCENARIOS.keys())), help='Which context to start.')
 @click.option('--primusrun', '-p', default=False, is_flag=True, help='Start the scenario with primus support (Linux Only).')
-def start(scenario, primusrun):
-    """Start a scenario experiment."""
-    click.echo('Starting the ' + click.style(scenario, bold=True) + ' scenario.')
+def start(context, primusrun):
+    """Start a context experiment."""
+    click.echo('Starting the ' + click.style(context, bold=True) + ' context.')
     start_dt = click.prompt("What's the starting date/time?",
-                            default=SCENARIOS[scenario]['start_dt'],
+                            default=SCENARIOS[context]['start_dt'],
                             value_proc=validate_dt)
-    SCENARIOS[scenario]['start_dt'] = start_dt
+    SCENARIOS[context]['start_dt'] = start_dt
     if primusrun:
-        subprocess.call(["primusrun", "blender", SCENARIOS[scenario]['exe']], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.call(["primusrun", "blender", SCENARIOS[context]['exe']], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     else:
-        subprocess.call(["blender", SCENARIOS[scenario]['exe']], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.call(["blender", SCENARIOS[context]['exe']], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     num_repeat = click.prompt("How many times you want to repeat this pattern?", default=1, type=int)
 
-    if not os.path.exists(SCENARIOS[scenario]['dataset_path']):
-        os.makedirs(SCENARIOS[scenario]['dataset_path'])
-    shutil.move('temp/output.csv', SCENARIOS[scenario]['dataset_path'])
-    os.rename(SCENARIOS[scenario]['dataset_path'] + 'output.csv', \
-              SCENARIOS[scenario]['dataset_path'] + datetime.strftime(start_dt, "%Y-%m-%d %H:%M:%S" + "_" + str(num_repeat) + ".csv"))
+    if not os.path.exists(SCENARIOS[context]['dataset_path']):
+        os.makedirs(SCENARIOS[context]['dataset_path'])
+    shutil.move('temp/output.csv', SCENARIOS[context]['dataset_path'])
+    os.rename(SCENARIOS[context]['dataset_path'] + 'output.csv', \
+              SCENARIOS[context]['dataset_path'] + datetime.strftime(start_dt, "%Y-%m-%d %H:%M:%S" + "_" + str(num_repeat) + ".csv"))
 
 @main.command()
 @click.option('--alpha', '-a', type=float, default=0.0, help='How random the repeated patterns.', )
-def compile(alpha):
-    """Compiles the datasets."""
+def aggregate(alpha):
+    """Aggregate the datasets."""
 
     s_dict = get_scenarios_dict()
     ss_dict = sort_scenarios_dict_by_day(s_dict)
