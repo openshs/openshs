@@ -75,7 +75,11 @@ class ActivityLayout(SimpleLayout):
         logic.states['Activity'] = widget.text
 
     def ok_btn_click(self, widget):
-        self.activity_duration = int(self.activity_duration_input.text)
+        if self.activity_duration_input.text.isdigit():
+            self.activity_duration = int(self.activity_duration_input.text)
+        else:
+            self.activity_duration = int(self.activity_duration_input.text[:-1]) * 60
+
         for i in range(self.activity_duration):
             logic.out.write(','.join([str(logic.states[i]) for i in sorted(logic.states.keys(), reverse=True)]) + '\n')
         self.activity_duration_input.visible = False
