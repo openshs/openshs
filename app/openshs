@@ -65,7 +65,7 @@ def main():
 
 @main.command()
 @click.option('--list-contexts', '-lc', default=False, is_flag=True, help='Lists the available contexts.')
-@click.option('--recorded-contexts', '-rs', default=False, is_flag=True, help='Shows the status of the recorded contexts.')
+@click.option('--recorded-contexts', '-rc', default=False, is_flag=True, help='Shows the status of the recorded contexts.')
 def status(list_contexts, recorded_contexts):
     """Shows the current status of the experiment."""
     if list_contexts:
