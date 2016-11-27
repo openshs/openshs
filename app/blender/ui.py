@@ -28,7 +28,8 @@ class ActivityLayout(SimpleLayout):
         self.eat_btn        = bgui.FrameButton(self.frame, text='eat', size=[0.1, 0.05], pos=[0.90, 0.90])
         self.personal_btn   = bgui.FrameButton(self.frame, text='personal', size=[0.1, 0.05], pos=[0.90, 0.85])
         self.work_btn       = bgui.FrameButton(self.frame, text='work', size=[0.1, 0.05], pos=[0.90, 0.80])
-        self.other_btn      = bgui.FrameButton(self.frame, text='other', size=[0.1, 0.05], pos=[0.90, 0.75])
+        self.anomaly_btn    = bgui.FrameButton(self.frame, text='anomaly', size=[0.1, 0.05], pos=[0.90, 0.75])
+        self.other_btn      = bgui.FrameButton(self.frame, text='other', size=[0.1, 0.05], pos=[0.90, 0.70])
 
         self.ok_btn = bgui.FrameButton(self.frame, text='Ok',
                 size=[0.3, 0.1], pos=[0, 0.2], options=bgui.BGUI_CENTERX)
@@ -48,6 +49,7 @@ class ActivityLayout(SimpleLayout):
         self.eat_btn.on_click = self.set_activity_click
         self.personal_btn.on_click = self.set_activity_click
         self.work_btn.on_click = self.set_activity_click
+        self.anomaly_btn.on_click = self.set_activity_click
         self.other_btn.on_click = self.set_activity_click
 
     def show(self):
