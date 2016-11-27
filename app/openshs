@@ -13,10 +13,10 @@ import itertools
 SCENARIOS = OrderedDict()
 SCENARIOS['morning'] = {'exe': 'blender/morning.blend',
                          'dataset_path': 'temp/morning/',
-                         'start_dt': datetime.strptime("2016-04-01 08:00:00", "%Y-%m-%d %H:%M:%S")}
+                         'start_dt': datetime.strptime("2016-02-01 08:00:00", "%Y-%m-%d %H:%M:%S")}
 SCENARIOS['evening'] = {'exe': 'blender/evening.blend',
                          'dataset_path': 'temp/evening/',
-                         'start_dt': datetime.strptime("2016-04-01 18:00:00", "%Y-%m-%d %H:%M:%S")}
+                         'start_dt': datetime.strptime("2016-02-01 18:00:00", "%Y-%m-%d %H:%M:%S")}
 
 def validate_dt(value):
     try:
