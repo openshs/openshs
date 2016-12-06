@@ -10,12 +10,10 @@ import shutil
 from collections import OrderedDict
 import itertools
 
-SCENARIOS = OrderedDict()
-SCENARIOS['morning'] = {'exe': 'blender/morning.blend',
-                         'dataset_path': 'temp/morning/',
+CONTEXTS = OrderedDict()
+CONTEXTS['morning'] = {'exe': 'blender/morning.blend',
                          'start_dt': datetime.strptime("2016-02-01 08:00:00", "%Y-%m-%d %H:%M:%S")}
-SCENARIOS['evening'] = {'exe': 'blender/evening.blend',
-                         'dataset_path': 'temp/evening/',
+CONTEXTS['evening'] = {'exe': 'blender/evening.blend',
                          'start_dt': datetime.strptime("2016-02-01 18:00:00", "%Y-%m-%d %H:%M:%S")}
 
 def validate_dt(value):
@@ -29,29 +27,29 @@ def get_file_names(path):
     files = os.listdir(path)
     return sorted([f.rstrip('.csv') for f in files], key=lambda x: datetime.strptime(x, "%Y-%m-%d %H:%M:%S"))
 
-def parse_scenario_filenames(filenames):
+def parse_context_filenames(filenames):
     di = {}
     for f in filenames:
         x = f.split('_')
         di[x[0]] = x[1].rstrip('.csv')
     return di
 
-def get_scenario_filenames(path):
+def get_context_filenames(path):
     files = os.listdir(path)
-    di = parse_scenario_filenames(files)
+    di = parse_context_filenames(files)
     return di
 
-def get_scenarios_dict():
+def get_contexts_dict():
     result = {}
-    for scenario in SCENARIOS:
-        di = get_scenario_filenames(SCENARIOS[scenario]['dataset_path'])
+    for context in CONTEXTS:
+        di = get_context_filenames(CONTEXTS[context]['dataset_path'])
         for k in di:
             result[k] = {'repeat': int(di[k]), \
-                         'filename': SCENARIOS[scenario]['dataset_path'] + k + '_' + str(di[k]) + '.csv'}
+                         'filename': CONTEXTS[context]['dataset_path'] + k + '_' + str(di[k]) + '.csv'}
 
     return result
 
-def sort_scenarios_dict_by_day(scenarios_dict):
+def sort_contexts_dict_by_day(scenarios_dict):
     sorted_dict = OrderedDict()
     sorted_keys = sorted(scenarios_dict, key=lambda x: datetime.strptime(x, "%Y-%m-%d %H:%M:%S"))
     for k in sorted_keys:
@@ -69,44 +67,40 @@ def main():
 def status(list_contexts, recorded_contexts):
     """Shows the current status of the experiment."""
     if list_contexts:
-        click.echo(", ".join([x for x in SCENARIOS.keys()]))
+        click.echo(", ".join([x for x in CONTEXTS.keys()]))
 
     if recorded_contexts:
-        for scenario in SCENARIOS:
-            click.echo("For context " + click.style(scenario, bold=True) + ":")
-            di = get_scenario_filenames(SCENARIOS[scenario]['dataset_path'])
+        for context in CONTEXTS:
+            click.echo("For context " + click.style(context, bold=True) + ":")
+            di = get_context_filenames(CONTEXTS[context]['dataset_path'])
             for k in sorted(di):
                 click.echo("\t" + k + " repeated: " + di[k])
 
 @main.command()
-@click.option('--context', '-c', type=click.Choice(list(SCENARIOS.keys())), help='Which context to start.')
-@click.option('--primusrun', '-p', default=False, is_flag=True, help='Start the scenario with primus support (Linux Only).')
+@click.option('--context', '-c', type=click.Choice(list(CONTEXTS.keys())), help='Which context to start.')
+@click.option('--primusrun', '-p', default=False, is_flag=True, help='Start the context with primus support (Linux Only).')
 def start(context, primusrun):
     """Start a context experiment."""
     click.echo('Starting the ' + click.style(context, bold=True) + ' context.')
-    start_dt = click.prompt("What's the starting date/time?",
-                            default=SCENARIOS[context]['start_dt'],
+    start_dt = click.prompt("What's the starting time?",
+                            default=CONTEXTS[context]['start_dt'],
                             value_proc=validate_dt)
-    SCENARIOS[context]['start_dt'] = start_dt
+    CONTEXTS[context]['start_dt'] = start_dt
     if primusrun:
-        subprocess.call(["primusrun", "blender", SCENARIOS[context]['exe']], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.call(["primusrun", "blender", CONTEXTS[context]['exe']], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     else:
-        subprocess.call(["blender", SCENARIOS[context]['exe']], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    num_repeat = click.prompt("How many times you want to repeat this pattern?", default=1, type=int)
+        subprocess.call(["blender", CONTEXTS[context]['exe']], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    weekday_p = click.prompt("Was that simulation for a weekday?", default=True, type=bool)
 
-    if not os.path.exists(SCENARIOS[context]['dataset_path']):
-        os.makedirs(SCENARIOS[context]['dataset_path'])
-    shutil.move('temp/output.csv', SCENARIOS[context]['dataset_path'])
-    os.rename(SCENARIOS[context]['dataset_path'] + 'output.csv', \
-              SCENARIOS[context]['dataset_path'] + datetime.strftime(start_dt, "%Y-%m-%d %H:%M:%S" + "_" + str(num_repeat) + ".csv"))
+    os.rename('temp/output.csv', 'temp/' + ('weekday_' if weekday_p else 'weekend_') + context + '_' + datetime.strftime(start_dt, "%Y-%m-%d %H:%M:%S") + '.csv')
 
 @main.command()
-@click.option('--alpha', '-a', type=float, default=0.0, help='How random the repeated patterns.', )
-def aggregate(alpha):
+@click.option('--days', '-d', type=int, default=30, help='How many days to generate.', )
+def aggregate(days):
     """Aggregate the datasets."""
 
-    s_dict = get_scenarios_dict()
-    ss_dict = sort_scenarios_dict_by_day(s_dict)
+    s_dict = get_contexts_dict()
+    ss_dict = sort_contexts_dict_by_day(s_dict)
 
     aday = timedelta(days=1)
 
@@ -129,7 +123,7 @@ def aggregate(alpha):
                 rows = [x for x in csv_reader]
                 start_dt = datetime.strptime(s_key, "%Y-%m-%d %H:%M:%S")
                 for _ in range(ss_dict[s_key]['repeat']):
-                    repeater = Repeater(rows, alpha, hasheader=False)
+                    repeater = Repeater(rows, days, hasheader=False)
                     rep_rows = repeater.consData()
                     d_rows.append(add_timestamp_field(rep_rows, start_dt))
                     start_dt += aday
