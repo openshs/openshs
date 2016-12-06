@@ -2,15 +2,18 @@
 
 import subprocess
 import csv
-from repeater import Repeater
-from datetime import datetime, timedelta
+from repeater import SamplesPool
+from datetime import datetime, timedelta, time
+from glob import glob
 import click
 import os
 import shutil
 from collections import OrderedDict
+from indexed import IndexedOrderedDict
 import itertools
+from random import randrange
 
-CONTEXTS = OrderedDict()
+CONTEXTS = IndexedOrderedDict()
 CONTEXTS['morning'] = {'exe': 'blender/morning.blend',
                          'start_dt': datetime.strptime("2016-02-01 08:00:00", "%Y-%m-%d %H:%M:%S")}
 CONTEXTS['evening'] = {'exe': 'blender/evening.blend',
@@ -23,38 +26,12 @@ def validate_dt(value):
     except ValueError:
         raise click.BadParameter("Please enter a valid datetime")
 
-def get_file_names(path):
-    files = os.listdir(path)
-    return sorted([f.rstrip('.csv') for f in files], key=lambda x: datetime.strptime(x, "%Y-%m-%d %H:%M:%S"))
-
-def parse_context_filenames(filenames):
-    di = {}
-    for f in filenames:
-        x = f.split('_')
-        di[x[0]] = x[1].rstrip('.csv')
-    return di
-
-def get_context_filenames(path):
-    files = os.listdir(path)
-    di = parse_context_filenames(files)
-    return di
-
-def get_contexts_dict():
-    result = {}
-    for context in CONTEXTS:
-        di = get_context_filenames(CONTEXTS[context]['dataset_path'])
-        for k in di:
-            result[k] = {'repeat': int(di[k]), \
-                         'filename': CONTEXTS[context]['dataset_path'] + k + '_' + str(di[k]) + '.csv'}
-
-    return result
-
-def sort_contexts_dict_by_day(scenarios_dict):
-    sorted_dict = OrderedDict()
-    sorted_keys = sorted(scenarios_dict, key=lambda x: datetime.strptime(x, "%Y-%m-%d %H:%M:%S"))
-    for k in sorted_keys:
-        sorted_dict[k] = scenarios_dict[k]
-    return sorted_dict
+def validate_date(value):
+    try:
+        dt = datetime.strptime(value, "%Y-%m-%d")
+        return dt
+    except ValueError:
+        raise click.BadParameter("Please enter a valid date")
 
 @click.group()
 def main():
@@ -63,18 +40,16 @@ def main():
 
 @main.command()
 @click.option('--list-contexts', '-lc', default=False, is_flag=True, help='Lists the available contexts.')
-@click.option('--recorded-contexts', '-rc', default=False, is_flag=True, help='Shows the status of the recorded contexts.')
-def status(list_contexts, recorded_contexts):
+@click.option('--recorded-samples', '-rs', default=False, is_flag=True, help='Shows the status of the recorded contexts samples.')
+def status(list_contexts, recorded_samples):
     """Shows the current status of the experiment."""
     if list_contexts:
         click.echo(", ".join([x for x in CONTEXTS.keys()]))
 
-    if recorded_contexts:
+    if recorded_samples:
         for context in CONTEXTS:
-            click.echo("For context " + click.style(context, bold=True) + ":")
-            di = get_context_filenames(CONTEXTS[context]['dataset_path'])
-            for k in sorted(di):
-                click.echo("\t" + k + " repeated: " + di[k])
+            files = glob('temp/*_' + context + '_*.csv')
+            click.echo("For context " + click.style(context, bold=True) + ": " + str(len(files)) + " Samples.")
 
 @main.command()
 @click.option('--context', '-c', type=click.Choice(list(CONTEXTS.keys())), help='Which context to start.')
@@ -96,41 +71,55 @@ def start(context, primusrun):
 
 @main.command()
 @click.option('--days', '-d', type=int, default=30, help='How many days to generate.', )
-def aggregate(days):
+@click.option('--start-date', '-sd', type=validate_date, help='The starting date for the aggregated dataset.')
+def aggregate(days, start_date):
     """Aggregate the datasets."""
 
-    s_dict = get_contexts_dict()
-    ss_dict = sort_contexts_dict_by_day(s_dict)
+    files = glob('temp/*.csv')
 
     aday = timedelta(days=1)
+    dt = start_date
 
     # The header row
-    first_el = list(ss_dict.items())[0][0]
-    with open(ss_dict[first_el]['filename'], 'r') as headfile:
+    with open(files[0], 'r') as headfile:
         csv_reader = csv.reader(headfile)
         header = next(csv_reader)
     header.append('timestamp')
 
+    d_rows = []
     with open('datasets/dataset.csv', 'w') as outf:
         csv_writer = csv.writer(outf)
         csv_writer.writerow(header)
 
-        d_rows = []
-        for s_key in ss_dict:
-            with open(ss_dict[s_key]['filename'], 'r') as inf:
-                csv_reader = csv.reader(inf)
-                next(csv_reader)
-                rows = [x for x in csv_reader]
-                start_dt = datetime.strptime(s_key, "%Y-%m-%d %H:%M:%S")
-                for _ in range(ss_dict[s_key]['repeat']):
-                    repeater = Repeater(rows, days, hasheader=False)
-                    rep_rows = repeater.consData()
-                    d_rows.append(add_timestamp_field(rep_rows, start_dt))
-                    start_dt += aday
+        for _ in range(days):
+            if is_weekday(dt):
+                for context in CONTEXTS:
+                    pool_files = glob('temp/weekday_' + context + '*.csv')
+                    pool = SamplesPool(pool_files)
+                    rep_rows = pool.generate_sample(header=False)
+                    d_rows += add_timestamp_field(rep_rows, random_timestamp(dt, pool_files))
+            else:
+                for context in CONTEXTS:
+                    pool_files = glob('temp/weekend_' + context + '*.csv')
+                    pool = SamplesPool(pool_files)
+                    rep_rows = pool.generate_sample(header=False)
+                    d_rows += add_timestamp_field(rep_rows, random_timestamp(dt, pool_files))
+            dt += aday
 
-        flatten_rows = list(itertools.chain(*d_rows))
-        sorted_rows = sorted(flatten_rows, key=lambda x: datetime.strptime(x[-1], "%Y-%m-%d %H:%M:%S"))
-        csv_writer.writerows(sorted_rows)
+        csv_writer.writerows(d_rows)
+
+def random_timestamp(dt, pool_files):
+    pool_times = [x[x.find(' ')+1:-4] for x in pool_files]
+    times = [datetime.strptime(x, "%H:%M:%S") for x in pool_times]
+    rand_date = random_date(min(times), max(times))
+    new_dt = datetime(dt.year, dt.month, dt.day, rand_date.hour, rand_date.minute, rand_date.second)
+    return new_dt
+
+def random_date(start, end):
+    delta = end - start
+    int_delta = (delta.days * 24 * 60 * 60) + delta.seconds
+    random_second = randrange(int_delta)
+    return start + timedelta(seconds=random_second)
 
 def add_timestamp_field(reader, start_dt):
     if type(start_dt) is str:
@@ -144,6 +133,12 @@ def add_timestamp_field(reader, start_dt):
         result.append(row)
         ts += asec
     return result
+
+def is_weekday(dt):
+    if dt.weekday() < 5:
+        return True
+    else:
+        return False
 
 
 if __name__ == '__main__':

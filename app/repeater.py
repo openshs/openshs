@@ -1,131 +1,307 @@
+import random
+from collections import OrderedDict, Counter
+from indexed import IndexedOrderedDict
+from itertools import islice
 import csv
-from random import randint
-from math import floor, ceil
-import sys
 
+def take(n, iterable):
+    "Return first n items of the iterable as a list"
+    return list(islice(iterable, n))
+def pick_by_prob(d):
+    r = random.uniform(0, sum(d.values()))
+    s = 0.0
+    for k, w in d.items():
+        s += w
+        if r < s: return k
+    return k
 
-class Repeater():
-    """
-    Given a csv reader of the dataset, this class repeats the dataset and
-    construct new random dataset
-    """
-    def __init__(self, dataset, alpha=0, hasheader=True):
+def convert_row_to_key(row):
+    return ''.join(row)
+
+def convert_key_to_row(key):
+    return [x for x in key]
+
+def strip_idx_from_key(key):
+    return key[key.find('_') + 1:]
+
+def strip_sample_and_idx_from_key(key):
+    return key[key.find('_', key.find('_') + 1) + 1:]
+
+def strip_sample_from_key(key):
+    return key[key.find('_') + 1:]
+
+def find_longest_index(samples):
+    """Returns the index of the longest item in an OrderedDict."""
+    if type(samples) is OrderedDict and len(samples) > 0:
+        longest_idx = 1
+        longest_len = 1
+        for s in samples:
+            if len(samples[s]) > longest_len:
+                longest_len = len(samples[s])
+                longest_idx = s
+        return longest_idx
+    else:
+        raise TypeError("Please pass in an OrderedDict containing at least a single element.")
+
+def find_longest_activities(samples):
+    if len(samples) > 0:
+        longest = -1
+        for sample in samples:
+            if len(samples[sample]) > longest:
+                longest = len(samples[sample])
+        return longest
+    else:
+        raise TypeError("Please pass in at least a single element.")
+
+def find_shortest_activities(samples):
+    if len(samples) > 0:
+        shortest = 999
+        for sample in samples:
+            if len(samples[sample]) < shortest:
+                shortest = len(samples[sample])
+        return shortest
+    else:
+        raise TypeError("Please pass in at least a single element.")
+
+def find_activities_length(samples):
+    if len(samples) > 0:
+        lens = [len(samples[sample]) for sample in samples]
+        return lens
+    else:
+        raise TypeError("Please pass in at least a single element.")
+
+def activity_counter(samples, time_step):
+    """Returns a dictionary where the keys are the activities labels and the values
+are the number of the activities occurrence at the spceified time_step.
+    samples: OrderedDict,
+    time_step: index, starting from 1 and not bigger than the longest activity in samples"""
+    if (type(samples) is OrderedDict) and \
+       (time_step > 0) and \
+       (time_step <= len(samples[find_longest_index(samples)])):
+        activities = []
+        for s in samples:
+            try:
+                activities.append(samples[s][time_step-1])
+            except IndexError:
+                pass
+        return Counter(activities)
+    else:
+        raise TypeError("Please pass in an OrderedDict and a time_step bigger than zero and less than the longest activity in the samples.")
+
+def unique_pattern_counter(reading):
+    """Returns an IndexedOrderedDict of unique sub-patterns in a reading"""
+    counter = IndexedOrderedDict()
+    idx = 0
+    for row in reading:
+        if counter.get(str(idx) + '_' + convert_row_to_key(row)):
+            counter[str(idx) + '_' + convert_row_to_key(row)] += 1
+        else:
+            idx += 1
+            counter[str(idx) + '_' + convert_row_to_key(row)] = 1
+    return counter
+
+def readings_counter(readings, time_step):
+    readings_count = []
+    for reading in readings:
         try:
-            if alpha > 1.0 or alpha < 0:
-                raise TypeError
-            self.alpha = alpha
-            self.dataset = dataset
-            self.data = [l for l in self.dataset]
-            if hasheader:
-                self.keys = self.data[0]
-                self.data = self.data[1:]
-            self.pat_ts, self.pattern = self.extractPats()
-            self.total_time = len(self.data)
-            self.init_state = self.data[0]
-            self.last_margin = 0
-        except TypeError:
-            print("Type Error: dataset must be iterable and alpha must be less than 1 and greater than 0.")
-            sys.exit(-1)
+            readings_count.append(reading.items()[time_step - 1])
+        except IndexError:
+            pass
+    return Counter(readings_count)
 
-    @staticmethod
-    def diffLists(l1, l2):
-        """returns a list of tuples of the index and the old and new values of
-        the difference between the two lists"""
-        if len(l1) != len(l2):
-            raise ValueError("Lists are of different sizes")
+def extract_labels(dataset):
+    li = []
+    for row in dataset:
+        li.append(row[-1])
+    return li
 
-        if (len(l1) == 0) or (len(l2) == 0):
-            raise ValueError("Lists cannot be empty")
+def strip_labels_column(dataset):
+    return [row[:-1] for row in dataset]
 
-        if (not isinstance(l1, list)) or (not isinstance(l1, list)):
-            raise TypeError("Expecting a list")
+def readings_idxdict(indexed_labels, dataset):
+    readings_dict = IndexedOrderedDict()
+    stripped_dataset = strip_labels_column(dataset)
+    for k in indexed_labels:
+        readings_dict[k] = take(indexed_labels[k], stripped_dataset)
+    return readings_dict
 
-        return [(i, j, k) for i, (j, k) in enumerate(zip(l1, l2)) if j != k]
+class SamplesPool(object):
+    def __init__(self, datasets):
+        self.samples = IndexedOrderedDict()
+        self.samples_file_descriptors = []
+        for i, dataset in enumerate(datasets, start=1):
+            self.samples_file_descriptors.append(open(dataset, 'r'))
+            d = csv.reader(self.samples_file_descriptors[i - 1])
+            self.header = next(d)
+            self.samples['sample' + str(i)] = d
 
-    def extractPats(self):
-        """returns the pattern's timestamp AND a list of lists of tuples that
-        represent the patterns in the data"""
+        self.extract_all_labels()
+        self.reset_file_descriptors()
+        self.attach_readings_to_labels()
+
+    def attach_readings_to_labels(self):
+        self.readings = dict()
+        for i, label in enumerate(self.labels):
+            reader = csv.reader(self.samples_file_descriptors[i])
+            next(reader)
+            # stripped_dataset = strip_labels_column(reader)
+            for l in self.labels[label]:
+                self.readings[ label + '_' + l ] = take(self.labels[label][l], reader)
+
+    def reset_file_descriptors(self):
+        for f in self.samples_file_descriptors:
+            f.seek(0)
+
+    def extract_all_labels(self):
+        self.labels = OrderedDict()
+        for sample in self.samples:
+            self.labels[sample] = unique_pattern_counter(extract_labels(self.samples[sample]))
+
+    def pick_labels_at(self, time_step, length):
         li = []
-        ts = []
-        temp = self.data[0]
-        for i, row in enumerate(self.data):
-            diffItem = self.diffLists(temp, row)
-            if diffItem:
-                li.append([x for x in diffItem])
-                ts.append(i)
-                temp = row
-        return ts, li
+        for label in self.labels:
+            if len(self.labels[label]) == length:
+                try:
+                    pick = self.labels[label].items()[time_step -1]
+                    li.append(label + '_' + pick[0])
+                except IndexError:
+                    pass
 
-    # @staticmethod
-    def marginCalc(self, pat_idx, total_time, num_pats):
-        try:
-            bucket_size = total_time // num_pats
-            sub_margin = bucket_size - floor(bucket_size * self.alpha)
-            bucket_size -= sub_margin
-            if self.last_margin == 0:
-                if sub_margin == 0:
-                    left_margin = self.last_margin
-                elif bucket_size == 0:
-                    left_margin = pat_idx
-                else:
-                    s = ceil(pat_idx / bucket_size)
-                    left_margin = pat_idx - s
+        return pick_by_prob(Counter(li))
+
+    def generate_sample(self, header=True):
+        lens = find_activities_length(self.labels)
+
+        new_dataset = []
+        if header:
+            new_dataset.append(self.header)
+
+        picked_labels = []
+
+        length = random.choice(lens)
+        for i, time_step in enumerate(range(1, length + 1)):
+            if time_step > 1:
+                pick = self.pick_labels_at(time_step, length)
+
+                # If we have duplicate picks, pick again
+                tries = 0
+                while((strip_sample_and_idx_from_key(pick) == strip_sample_and_idx_from_key(picked_labels[i -1])) and (tries <= 50)):
+                    pick = self.pick_labels_at(time_step, length)
+                    tries += 1
+                picked_labels.append(pick)
             else:
-                left_margin = self.last_margin
+                picked_labels.append(self.pick_labels_at(time_step, length))
 
-            right_margin = left_margin + bucket_size
-            right_margin -= 1
 
-            return left_margin, right_margin
-        except ZeroDivisionError:
-            print("Error: Too many changes in the sensors and not enough data to generate new replications.")
-            sys.exit(-1)
+        # Check if we have duplicate last activity
+        if strip_sample_and_idx_from_key(picked_labels[-1]) == strip_sample_and_idx_from_key(picked_labels[-2]):
+            picked_labels.pop()
 
-    def randomizePos(self):
-        """returns a list of random positions for the patterns spanning the
-        whole time"""
-        num_pats = len(self.pattern)
-        dist = []
-        for pi in self.pat_ts:
-            leftMargin, rightMargin = self.marginCalc(pi, self.total_time, num_pats)
-            # print(str(pi) + " L=" + str(leftMargin) + " R=" + str(rightMargin))
-            # leftMargin = floor(leftMargin * self.alpha)
-            # rightMargin = floor(rightMargin * self.alpha)
-            # dist.append(randint(pi - leftMargin, pi + rightMargin))
-            if leftMargin >= rightMargin:
-                dist.append(pi)
-            else:
-                dist.append(randint(leftMargin, rightMargin))
-            self.last_margin = rightMargin + 1
-        return dist
+        for pick in picked_labels:
+            new_dataset += self.readings[pick]
 
-    def consData(self):
-        "constructs a dataset given the inital states and the pattern"
-        dataSet = []
-        patSet = []
+        return new_dataset
 
-        temp = self.init_state[:]
 
-        for p in self.pattern:
-            for e in p:
-                temp[e[0]] = e[2]
-            patSet.append(list(temp))
+def test():
+    activities_samples = OrderedDict()
+    activities_samples[1] = ['sleep', 'eat',      'sleep']
+    activities_samples[2] = ['sleep', 'personal', 'eat'  ]
+    activities_samples[3] = ['sleep', 'eat']
+    activities_samples[4] = ['sleep', 'eat']
 
-        curRow = self.init_state[:]
-        randPos = self.randomizePos()
+    readings_samples = [
+        [ # 1
+            ['0', '1', '1'],
+            ['0', '1', '1'],
+            ['0', '1', '1'],
+            ['0', '1', '1'],
+            ['1', '0', '1'],
+            ['1', '0', '1'],
+            ['1', '0', '1'],
+            ['1', '0', '1'],
+            ['1', '0', '1']
+        ],
+        [ # 2
+            ['0', '1', '1'],
+            ['0', '1', '1'],
+            ['0', '1', '1'],
+            ['0', '1', '1'],
+            ['0', '0', '1'],
+            ['0', '0', '1'],
+            ['0', '0', '1'],
+            ['0', '0', '1'],
+            ['0', '0', '1']
+        ],
+        [ # 3
+            ['0', '1', '1'],
+            ['0', '1', '1'],
+            ['0', '1', '1'],
+            ['0', '1', '1'],
+            ['0', '1', '1'],
+            ['0', '1', '1'],
+            ['0', '1', '1'],
+            ['0', '1', '1'],
+            ['0', '1', '1']
+        ],
+        [ # 4
+            ['0', '1', '1'],
+            ['0', '1', '1'],
+            ['0', '1', '1'],
+            ['0', '0', '1'],
+            ['0', '0', '1'],
+            ['0', '0', '1'],
+            ['0', '1', '1'],
+            ['0', '1', '1'],
+            ['0', '1', '1']
+        ],
+        [ # 5
+            ['1', '1', '1'],
+            ['1', '1', '1'],
+            ['1', '1', '1'],
+            ['1', '0', '1'],
+            ['1', '0', '1'],
+            ['1', '0', '1'],
+            ['1', '1', '1'],
+            ['1', '1', '1'],
+            ['1', '1', '1']
+        ]
+    ]
 
-        for i in range(self.total_time):
-            if i in randPos:
-                curRow = patSet.pop(0)
-            dataSet.append(curRow)
+    readings_list = []
+    for reading in readings_samples:
+        readings_list.append(unique_pattern_counter(reading))
 
-        return dataSet
+    k = activity_counter(activities_samples, 3)
+    print('-------------------------- Generating activities for time t')
+
+    for _ in range(10):
+        print(pick_by_prob(k))
+    print('-------------------------- Patterns in readings')
+
+    for r in readings_list:
+        print(list(r))
+
+    print('-------------------------- Generating readings for time t')
+    k = readings_counter(readings_list, 1)
+    for _ in range(10):
+        print(pick_by_prob(k))
+
+def main():
+    pool = SamplesPool(['samples/sample1.csv', \
+                        'samples/sample2.csv', \
+                        'samples/sample3.csv', \
+                        'samples/sample4.csv', \
+                        'samples/sample5.csv'])
+
+    for _ in range(10):
+        pool.generate_sample()
+
+    #for i in range(10):
+    #    writer = csv.writer(open('gen_data/out' + str(i) + '.csv', 'w'))
+    #    new_dataset = pool.generate_sample()
+    #    writer.writerows(new_dataset)
 
 
 if __name__ == '__main__':
-
-    f = open("temp/temp_dataset.csv", "r")
-    r = csv.reader(f)
-    obj = Repeater(r)
-    obj.consData()
-    f.close()
+    main()
