@@ -61,11 +61,18 @@ def start(context, primusrun):
                             default=CONTEXTS[context]['start_dt'],
                             value_proc=validate_dt)
     CONTEXTS[context]['start_dt'] = start_dt
+
+    # Write the starting datetime for blender to read
+    sf = open('blender/start_time.txt', 'w')
+    sf.write(str(int(start_dt.timestamp())))
+    sf.close()
+
+    weekday_p = is_weekday(start_dt)
+
     if primusrun:
         subprocess.call(["primusrun", "blender", CONTEXTS[context]['exe']], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     else:
         subprocess.call(["blender", CONTEXTS[context]['exe']], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    weekday_p = click.prompt("Was that simulation for a weekday?", default=True, type=bool)
 
     os.rename('temp/output.csv', 'temp/' + ('weekday_' if weekday_p else 'weekend_') + context + '_' + datetime.strftime(start_dt, "%Y-%m-%d %H:%M:%S") + '.csv')
 
