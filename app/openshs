@@ -60,14 +60,15 @@ def start(context, primusrun):
     start_dt = click.prompt("What's the starting time?",
                             default=CONTEXTS[context]['start_dt'],
                             value_proc=validate_dt)
+
     CONTEXTS[context]['start_dt'] = start_dt
+
+    weekday_p = is_weekday(start_dt)
 
     # Write the starting datetime for blender to read
     sf = open('blender/start_time.txt', 'w')
     sf.write(str(int(start_dt.timestamp())))
     sf.close()
-
-    weekday_p = is_weekday(start_dt)
 
     if primusrun:
         subprocess.call(["primusrun", "blender", CONTEXTS[context]['exe']], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
