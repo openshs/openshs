@@ -11,7 +11,7 @@ import shutil
 from collections import OrderedDict
 from indexed import IndexedOrderedDict
 import itertools
-from random import randrange
+from random import randrange, choice
 
 CONTEXTS = IndexedOrderedDict()
 CONTEXTS['morning'] = {'exe': 'blender/morning.blend',
@@ -78,9 +78,10 @@ def start(context, primusrun):
     os.rename('temp/output.csv', 'temp/' + ('weekday_' if weekday_p else 'weekend_') + context + '_' + datetime.strftime(start_dt, "%Y-%m-%d %H:%M:%S") + '.csv')
 
 @main.command()
-@click.option('--days', '-d', type=int, default=30, help='How many days to generate.', )
+@click.option('--days', '-d', type=int, default=30, help='How many days to generate.')
 @click.option('--start-date', '-sd', type=validate_date, help='The starting date for the aggregated dataset.')
-def aggregate(days, start_date):
+@click.option('--time-margin', '-tm', type=int, default=0, help='The starting time margin for each replicated sample.')
+def aggregate(days, start_date, time_margin):
     """Aggregate the datasets."""
 
     files = glob('temp/*.csv')
@@ -105,22 +106,25 @@ def aggregate(days, start_date):
                     pool_files = glob('temp/weekday_' + context + '*.csv')
                     pool = SamplesPool(pool_files)
                     rep_rows = pool.generate_sample(header=False)
-                    d_rows += add_timestamp_field(rep_rows, random_timestamp(dt, pool_files))
+                    d_rows += add_timestamp_field(rep_rows, random_timestamp(dt, pool_files, time_margin))
             else:
                 for context in CONTEXTS:
                     pool_files = glob('temp/weekend_' + context + '*.csv')
                     pool = SamplesPool(pool_files)
                     rep_rows = pool.generate_sample(header=False)
-                    d_rows += add_timestamp_field(rep_rows, random_timestamp(dt, pool_files))
+                    d_rows += add_timestamp_field(rep_rows, random_timestamp(dt, pool_files, time_margin))
             dt += aday
 
         csv_writer.writerows(d_rows)
 
-def random_timestamp(dt, pool_files):
+def random_timestamp(dt, pool_files, time_margin):
     pool_times = [x[x.find(' ')+1:-4] for x in pool_files]
     times = [datetime.strptime(x, "%H:%M:%S") for x in pool_times]
-    rand_date = random_date(min(times), max(times))
-    new_dt = datetime(dt.year, dt.month, dt.day, rand_date.hour, rand_date.minute, rand_date.second)
+    random_sample = choice(times)
+    if time_margin > 0:
+        margin = timedelta(seconds=time_margin * 60)
+        random_sample = random_date(random_sample - (margin/2), random_sample + (margin/2))
+    new_dt = datetime(dt.year, dt.month, dt.day, random_sample.hour, random_sample.minute, random_sample.second)
     return new_dt
 
 def random_date(start, end):
