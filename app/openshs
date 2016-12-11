@@ -33,10 +33,47 @@ def validate_date(value):
     except ValueError:
         raise click.BadParameter("Please enter a valid date")
 
+def random_timestamp(dt, pool_files, time_margin):
+    pool_times = [x[x.find(' ')+1:-4] for x in pool_files]
+    times = [datetime.strptime(x, "%H:%M:%S") for x in pool_times]
+    random_sample = choice(times)
+    if time_margin > 0:
+        margin = timedelta(seconds=time_margin * 60)
+        random_sample = random_date(random_sample - (margin/2), random_sample + (margin/2))
+    new_dt = datetime(dt.year, dt.month, dt.day, random_sample.hour, random_sample.minute, random_sample.second)
+    return new_dt
+
+def random_date(start, end):
+    delta = end - start
+    int_delta = (delta.days * 24 * 60 * 60) + delta.seconds
+    random_second = randrange(int_delta)
+    return start + timedelta(seconds=random_second)
+
+def add_timestamp_field(reader, start_dt):
+    if type(start_dt) is str:
+        start_dt = datetime.strptime(start_dt, "%Y-%m-%d %H:%M:%S")
+    ts = start_dt
+    asec = timedelta(seconds=1)
+    result = []
+
+    for i in reader:
+        row = i + [ts.strftime("%Y-%m-%d %H:%M:%S")]
+        result.append(row)
+        ts += asec
+    return result
+
+def is_weekday(dt):
+    if dt.weekday() < 5:
+        return True
+    else:
+        return False
+
+
 @click.group()
 def main():
     """OpenSHS: Open Smart Home Simulator"""
     pass
+
 
 @main.command()
 @click.option('--list-contexts', '-lc', default=False, is_flag=True, help='Lists the available contexts.')
@@ -49,7 +86,11 @@ def status(list_contexts, recorded_samples):
     if recorded_samples:
         for context in CONTEXTS:
             files = glob('temp/*_' + context + '_*.csv')
-            click.echo("For context " + click.style(context, bold=True) + ": " + str(len(files)) + " Samples.")
+            weekdays = str(len([f for f in files if f.split('temp/')[1].startswith('weekday')]))
+            weekends = str(len([f for f in files if f.split('temp/')[1].startswith('weekend')]))
+            click.echo("For context " + click.style(context, bold=True) + ", " + click.style('weekdays', bold=True) + ": " + weekdays + " Samples.")
+            click.echo("For context " + click.style(context, bold=True) + ", " + click.style('weekends', bold=True) + ": " + weekends + " Samples.")
+
 
 @main.command()
 @click.option('--context', '-c', type=click.Choice(list(CONTEXTS.keys())), help='Which context to start.')
@@ -76,6 +117,7 @@ def start(context, primusrun):
         subprocess.call(["blender", CONTEXTS[context]['exe']], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
     os.rename('temp/output.csv', 'temp/' + ('weekday_' if weekday_p else 'weekend_') + context + '_' + datetime.strftime(start_dt, "%Y-%m-%d %H:%M:%S") + '.csv')
+
 
 @main.command()
 @click.option('--days', '-d', type=int, default=30, help='How many days to generate.')
@@ -116,41 +158,6 @@ def aggregate(days, start_date, time_margin):
             dt += aday
 
         csv_writer.writerows(d_rows)
-
-def random_timestamp(dt, pool_files, time_margin):
-    pool_times = [x[x.find(' ')+1:-4] for x in pool_files]
-    times = [datetime.strptime(x, "%H:%M:%S") for x in pool_times]
-    random_sample = choice(times)
-    if time_margin > 0:
-        margin = timedelta(seconds=time_margin * 60)
-        random_sample = random_date(random_sample - (margin/2), random_sample + (margin/2))
-    new_dt = datetime(dt.year, dt.month, dt.day, random_sample.hour, random_sample.minute, random_sample.second)
-    return new_dt
-
-def random_date(start, end):
-    delta = end - start
-    int_delta = (delta.days * 24 * 60 * 60) + delta.seconds
-    random_second = randrange(int_delta)
-    return start + timedelta(seconds=random_second)
-
-def add_timestamp_field(reader, start_dt):
-    if type(start_dt) is str:
-        start_dt = datetime.strptime(start_dt, "%Y-%m-%d %H:%M:%S")
-    ts = start_dt
-    asec = timedelta(seconds=1)
-    result = []
-
-    for i in reader:
-        row = i + [ts.strftime("%Y-%m-%d %H:%M:%S")]
-        result.append(row)
-        ts += asec
-    return result
-
-def is_weekday(dt):
-    if dt.weekday() < 5:
-        return True
-    else:
-        return False
 
 
 if __name__ == '__main__':
