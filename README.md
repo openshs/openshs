@@ -18,3 +18,6 @@ python openshs aggregate -d 30 -sd 2016-02-01 -tm 10
 ```
 
 This will generate 30 days worth of data starting from 2016-02-01 and with a time margin of 10 minutes. The final dataset will be placed in `app/datasets`
+
+# To cite this work
+[![DOI](https://zenodo.org/badge/73079640.svg)](https://zenodo.org/badge/latestdoi/73079640)
