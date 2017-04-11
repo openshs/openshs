@@ -123,7 +123,8 @@ def start(context, primusrun):
 @click.option('--days', '-d', type=int, default=30, help='How many days to generate.')
 @click.option('--start-date', '-sd', type=validate_date, help='The starting date for the aggregated dataset.')
 @click.option('--time-margin', '-tm', type=int, default=0, help='The starting time margin for each replicated sample.')
-def aggregate(days, start_date, time_margin):
+@click.option('--variable-activities', '-va', default=False, is_flag=True, help='Make the activities duration variable.')
+def aggregate(days, start_date, time_margin, variable_activities):
     """Aggregate the datasets."""
 
     files = glob('temp/*.csv')
@@ -146,13 +147,13 @@ def aggregate(days, start_date, time_margin):
             if is_weekday(dt):
                 for context in CONTEXTS:
                     pool_files = glob('temp/weekday_' + context + '*.csv')
-                    pool = SamplesPool(pool_files)
+                    pool = SamplesPool(pool_files, variable_activities)
                     rep_rows = pool.generate_sample(header=False)
                     d_rows += add_timestamp_field(rep_rows, random_timestamp(dt, pool_files, time_margin))
             else:
                 for context in CONTEXTS:
                     pool_files = glob('temp/weekend_' + context + '*.csv')
-                    pool = SamplesPool(pool_files)
+                    pool = SamplesPool(pool_files, variable_activities)
                     rep_rows = pool.generate_sample(header=False)
                     d_rows += add_timestamp_field(rep_rows, random_timestamp(dt, pool_files, time_margin))
             dt += aday

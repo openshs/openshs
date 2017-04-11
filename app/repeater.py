@@ -3,6 +3,7 @@ from collections import OrderedDict, Counter
 from indexed import IndexedOrderedDict
 from itertools import islice
 import csv
+from math import ceil
 
 def take(n, iterable):
     "Return first n items of the iterable as a list"
@@ -126,9 +127,10 @@ def readings_idxdict(indexed_labels, dataset):
     return readings_dict
 
 class SamplesPool(object):
-    def __init__(self, datasets):
+    def __init__(self, datasets, variable_activities=False):
         self.samples = IndexedOrderedDict()
         self.samples_file_descriptors = []
+        self.variable_activities = variable_activities
         for i, dataset in enumerate(datasets, start=1):
             self.samples_file_descriptors.append(open(dataset, 'r'))
             d = csv.reader(self.samples_file_descriptors[i - 1])
@@ -197,11 +199,59 @@ class SamplesPool(object):
         if strip_sample_and_idx_from_key(picked_labels[-1]) == strip_sample_and_idx_from_key(picked_labels[-2]):
             picked_labels.pop()
 
-        for pick in picked_labels:
-            new_dataset += self.readings[pick]
+        # Check for variable activities flag
+        if self.variable_activities:
+            for pick in picked_labels:
+                new_dataset += randomize_reading_len(self.readings[pick])
+        else:
+            for pick in picked_labels:
+                new_dataset += self.readings[pick]
 
         return new_dataset
 
+def randomize_reading_len(readings):
+    idxs = find_longest_sub_pattern_idx(readings)
+
+    max_len  = idxs[1] - idxs[0]
+    min_len  = int(ceil(0.05 * max_len))
+    rand_len = random.randint(min_len, max_len)
+
+    start = idxs[0] + min_len
+    end   = idxs[0] + rand_len
+
+    return readings[:start] + readings[end:]
+
+def find_longest_sub_pattern_idx(readings):
+    start_idx = 0
+    longest = 0
+    subpats = []
+    for i, row in enumerate(readings):
+        if readings[start_idx] == row:
+            longest += 1
+        else:
+            subpats.append((start_idx, longest))
+            start_idx = longest
+            longest += 1
+    subpats.append((start_idx, longest))
+
+    ll = 1
+    longest = 0
+    for i, idx in enumerate(subpats):
+        if (idx[1] - idx[0]) > ll:
+            ll = idx[1] - idx[0]
+            longest = i
+
+    return subpats[longest]
+
+def test2():
+    samples = [
+               ['0', '1', '1'],
+               ['0', '1', '1'],
+               ['1', '0', '1'],
+               ['1', '0', '1'],
+               ['1', '0', '1'],
+              ]
+    print(find_longest_sub_pattern_idx(samples))
 
 def test():
     activities_samples = OrderedDict()
@@ -288,20 +338,24 @@ def test():
         print(pick_by_prob(k))
 
 def main():
-    pool = SamplesPool(['samples/sample1.csv', \
+
+    for i in range(10):
+        pool = SamplesPool([
+                        'samples/sample1.csv', \
                         'samples/sample2.csv', \
                         'samples/sample3.csv', \
                         'samples/sample4.csv', \
-                        'samples/sample5.csv'])
+                        'samples/sample5.csv'
+                        ])
 
-    for _ in range(10):
-        pool.generate_sample()
+    #for _ in range(10):
+    #    pool.generate_sample()
 
-    #for i in range(10):
-    #    writer = csv.writer(open('gen_data/out' + str(i) + '.csv', 'w'))
-    #    new_dataset = pool.generate_sample()
-    #    writer.writerows(new_dataset)
+        writer = csv.writer(open('out' + str(i) + '.csv', 'w'))
+        new_dataset = pool.generate_sample()
+        writer.writerows(new_dataset)
 
 
 if __name__ == '__main__':
     main()
+    #test2()
