@@ -1,1 +1,10 @@
 click
+indexed
+
+Ubuntu 14.04:
+- Pip
+    sudo apt-get install python3-pip
+- Module click
+    sudo pip install click or sudo pip3 install click (for python3)
+- Module indexed.py
+    sudo pip install indexed.py or sudo pip3 install indexed.py (for python3)
