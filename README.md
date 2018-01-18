@@ -3,6 +3,7 @@ Open Smart Home Simulator
 
 # Quick start
 Ensure you have blender installed. To start a simulation of our demo:
+Ensure you have installed python3 and modules click and indexed.py (see requirements.txt file).
 
 ```
 cd app/
