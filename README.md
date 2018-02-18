@@ -1,5 +1,6 @@
 # OpenSHS
 Open Smart Home Simulator
+![OpenSHS](img/smarthome.png)
 
 # Quick start
 Ensure you have blender installed. To start a simulation of our demo:
@@ -20,5 +21,9 @@ python openshs aggregate -d 30 -sd 2016-02-01 -tm 10
 
 This will generate 30 days worth of data starting from 2016-02-01 and with a time margin of 10 minutes. The final dataset will be placed in `app/datasets`
 
-# To cite this work
+# Citations
+## The accompanying research paper
+[OpenSHS: Open Smart Home Simulator](http://www.mdpi.com/1424-8220/17/5/1003/htm) published in [Sensors Journal](http://www.mdpi.com/journal/sensors)
+
+## The code:
 [![DOI](https://zenodo.org/badge/73079640.svg)](https://zenodo.org/badge/latestdoi/73079640)
