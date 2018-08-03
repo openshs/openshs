@@ -3,7 +3,10 @@ Open Smart Home Simulator
 ![OpenSHS](img/smarthome.png)
 
 # Demo Video
-[![Demo of OpenSHS](http://img.youtube.com/vi/lx9Ziqi162I/0.jpg)](http://www.youtube.com/watch?v=lx9Ziqi162I)
+[![Demo of OpenSHS](https://img.youtube.com/vi/lx9Ziqi162I/0.jpg)](https://www.youtube.com/watch?v=lx9Ziqi162I)
+
+# Installing OpenSHS on Windows Video
+[![Installing on Windows](https://img.youtube.com/vi/GHHsXPvaAnY/0.jpg)](https://www.youtube.com/watch?v=GHHsXPvaAnY)
 
 # Quick Start
 Ensure you have blender installed. To start a simulation of our demo:
