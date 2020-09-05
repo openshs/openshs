@@ -1,3 +1,6 @@
+### NOTE: This project requires Blender 2.7 or less
+Newer versions of Blender removed the Blender Game Engine (BGE) which is required for OpenSHS.
+
 # OpenSHS
 Open Smart Home Simulator
 ![OpenSHS](img/smarthome.png)
