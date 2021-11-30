@@ -15,13 +15,13 @@ from random import randrange, choice
 
 CONTEXTS = IndexedOrderedDict()
 CONTEXTS['morning'] = {'exe': 'blender/morning.blend',
-                         'start_dt': datetime.strptime("2016-02-01 08:00:00", "%Y-%m-%d %H:%M:%S")}
+                         'start_dt': datetime.strptime("2016-02-01 08-00-00", "%Y-%m-%d %H-%M-%S")}
 CONTEXTS['evening'] = {'exe': 'blender/evening.blend',
-                         'start_dt': datetime.strptime("2016-02-01 18:00:00", "%Y-%m-%d %H:%M:%S")}
+                         'start_dt': datetime.strptime("2016-02-01 18-00-00", "%Y-%m-%d %H-%M-%S")}
 
 def validate_dt(value):
     try:
-        dt = datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
+        dt = datetime.strptime(value, "%Y-%m-%d %H-%M-%S")
         return dt
     except ValueError:
         raise click.BadParameter("Please enter a valid datetime")
@@ -35,7 +35,7 @@ def validate_date(value):
 
 def random_timestamp(dt, pool_files, time_margin):
     pool_times = [x[x.find(' ')+1:-4] for x in pool_files]
-    times = [datetime.strptime(x, "%H:%M:%S") for x in pool_times]
+    times = [datetime.strptime(x, "%H-%M-%S") for x in pool_times]
     random_sample = choice(times)
     if time_margin > 0:
         margin = timedelta(seconds=time_margin * 60)
@@ -51,13 +51,13 @@ def random_date(start, end):
 
 def add_timestamp_field(reader, start_dt):
     if type(start_dt) is str:
-        start_dt = datetime.strptime(start_dt, "%Y-%m-%d %H:%M:%S")
+        start_dt = datetime.strptime(start_dt, "%Y-%m-%d %H-%M-%S")
     ts = start_dt
     asec = timedelta(seconds=1)
     result = []
 
     for i in reader:
-        row = i + [ts.strftime("%Y-%m-%d %H:%M:%S")]
+        row = i + [ts.strftime("%Y-%m-%d %H-%M-%S")]
         result.append(row)
         ts += asec
     return result
@@ -116,7 +116,7 @@ def start(context, primusrun):
     else:
         subprocess.call(["blender", CONTEXTS[context]['exe']], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
-    os.rename('temp/output.csv', 'temp/' + ('weekday_' if weekday_p else 'weekend_') + context + '_' + datetime.strftime(start_dt, "%Y-%m-%d %H:%M:%S") + '.csv')
+    os.rename('temp/output.csv', 'temp/' + ('weekday_' if weekday_p else 'weekend_') + context + '_' + datetime.strftime(start_dt, "%Y-%m-%d %H-%M-%S") + '.csv')
 
 
 @main.command()
