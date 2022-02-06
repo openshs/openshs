@@ -14,14 +14,17 @@ import itertools
 from random import randrange, choice
 
 CONTEXTS = IndexedOrderedDict()
-CONTEXTS['morning'] = {'exe': 'blender/morning.blend',
+CONTEXTS['morning'] = {'exe': os.path.join('blender','morning.blend'),
                          'start_dt': datetime.strptime("2016-02-01 08-00-00", "%Y-%m-%d %H-%M-%S")}
-CONTEXTS['evening'] = {'exe': 'blender/evening.blend',
+CONTEXTS['evening'] = {'exe': os.path.join('blender', 'evening.blend'),
                          'start_dt': datetime.strptime("2016-02-01 18-00-00", "%Y-%m-%d %H-%M-%S")}
 
 def validate_dt(value):
     try:
-        dt = datetime.strptime(value, "%Y-%m-%d %H-%M-%S")
+        # The string value of the variable "value" contains or may contain 
+        # ':' characters that must be replaced by '-'
+        dt = datetime.strptime(str(value).replace(':','-'), 
+            "%Y-%m-%d %H-%M-%S")
         return dt
     except ValueError:
         raise click.BadParameter("Please enter a valid datetime")
@@ -115,9 +118,20 @@ def start(context, primusrun):
         subprocess.call(["primusrun", "blender", CONTEXTS[context]['exe']], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     else:
         subprocess.call(["blender", CONTEXTS[context]['exe']], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-
-    os.rename('temp/output.csv', 'temp/' + ('weekday_' if weekday_p else 'weekend_') + context + '_' + datetime.strftime(start_dt, "%Y-%m-%d %H-%M-%S") + '.csv')
-
+    count = 0
+    while True:
+        try:
+            data_week_csv = os.path.join('temp', 
+                ('weekday_' if weekday_p else 'weekend_') + context + '_' + datetime.strftime(start_dt, "%Y-%m-%d %H-%M-%S") +
+                ('' if not count else '_' + str(count) ) + '.csv')
+            data_out_csv = os.path.join('temp', 'output.csv')
+            os.rename(data_out_csv, data_week_csv)
+            click.echo('Dataset saved as  ' + data_week_csv); break
+        except FileExistsError:
+            click.echo('File ' + data_week_csv +  ' already exists')
+            count+=1
+        except FileNotFoundError:
+            click.echo('Ungenerated dataset'); break
 
 @main.command()
 @click.option('--days', '-d', type=int, default=30, help='How many days to generate.')
