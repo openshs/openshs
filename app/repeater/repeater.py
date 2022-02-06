@@ -4,6 +4,7 @@ from indexed import IndexedOrderedDict
 from itertools import islice
 import csv
 from math import ceil
+import os
 
 def take(n, iterable):
     "Return first n items of the iterable as a list"
@@ -125,89 +126,6 @@ def readings_idxdict(indexed_labels, dataset):
     for k in indexed_labels:
         readings_dict[k] = take(indexed_labels[k], stripped_dataset)
     return readings_dict
-
-class SamplesPool(object):
-    def __init__(self, datasets, variable_activities=False):
-        self.samples = IndexedOrderedDict()
-        self.samples_file_descriptors = []
-        self.variable_activities = variable_activities
-        for i, dataset in enumerate(datasets, start=1):
-            self.samples_file_descriptors.append(open(dataset, 'r'))
-            d = csv.reader(self.samples_file_descriptors[i - 1])
-            self.header = next(d)
-            self.samples['sample' + str(i)] = d
-
-        self.extract_all_labels()
-        self.reset_file_descriptors()
-        self.attach_readings_to_labels()
-
-    def attach_readings_to_labels(self):
-        self.readings = dict()
-        for i, label in enumerate(self.labels):
-            reader = csv.reader(self.samples_file_descriptors[i])
-            next(reader)
-            # stripped_dataset = strip_labels_column(reader)
-            for l in self.labels[label]:
-                self.readings[ label + '_' + l ] = take(self.labels[label][l], reader)
-
-    def reset_file_descriptors(self):
-        for f in self.samples_file_descriptors:
-            f.seek(0)
-
-    def extract_all_labels(self):
-        self.labels = OrderedDict()
-        for sample in self.samples:
-            self.labels[sample] = unique_pattern_counter(extract_labels(self.samples[sample]))
-
-    def pick_labels_at(self, time_step, length):
-        li = []
-        for label in self.labels:
-            if len(self.labels[label]) == length:
-                try:
-                    pick = self.labels[label].items()[time_step -1]
-                    li.append(label + '_' + pick[0])
-                except IndexError:
-                    pass
-
-        return pick_by_prob(Counter(li))
-
-    def generate_sample(self, header=True):
-        lens = find_activities_length(self.labels)
-
-        new_dataset = []
-        if header:
-            new_dataset.append(self.header)
-
-        picked_labels = []
-
-        length = random.choice(lens)
-        for i, time_step in enumerate(range(1, length + 1)):
-            if time_step > 1:
-                pick = self.pick_labels_at(time_step, length)
-
-                # If we have duplicate picks, pick again
-                tries = 0
-                while((strip_sample_and_idx_from_key(pick) == strip_sample_and_idx_from_key(picked_labels[i -1])) and (tries <= 50)):
-                    pick = self.pick_labels_at(time_step, length)
-                    tries += 1
-                picked_labels.append(pick)
-            else:
-                picked_labels.append(self.pick_labels_at(time_step, length))
-
-
-        # Check if we have duplicate last activity
-        if strip_sample_and_idx_from_key(picked_labels[-1]) == strip_sample_and_idx_from_key(picked_labels[-2]):
-            picked_labels.pop()
-
-        # Check for variable activities flag
-        if self.variable_activities:
-            for pick in picked_labels:
-                new_dataset += randomize_reading_len(self.readings[pick])
-        else:
-            for pick in picked_labels:
-                new_dataset += self.readings[pick]
-
-        return new_dataset
 
 def randomize_reading_len(readings):
     idxs = find_longest_sub_pattern_idx(readings)
@@ -338,15 +256,15 @@ def test():
         print(pick_by_prob(k))
 
 def main():
-
+    from samplespool import SamplesPool
     for i in range(10):
         pool = SamplesPool([
-                        'samples/sample1.csv', \
-                        'samples/sample2.csv', \
-                        'samples/sample3.csv', \
-                        'samples/sample4.csv', \
-                        'samples/sample5.csv'
-                        ])
+                os.path.join('samples','sample1.csv'), \
+                os.path.join('samples','sample2.csv'), \
+                os.path.join('samples','sample3.csv'), \
+                os.path.join('samples','sample4.csv'), \
+                os.path.join('samples','sample5.csv')
+            ])
 
     #for _ in range(10):
     #    pool.generate_sample()
