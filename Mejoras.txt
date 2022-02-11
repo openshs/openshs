@@ -1,0 +1,1 @@
+https://blender.stackexchange.com/questions/93913/blender-game-engine-toggle-fullscreen-with-script
