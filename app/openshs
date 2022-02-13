@@ -14,10 +14,15 @@ import itertools
 from random import randrange, choice
 
 CONTEXTS = IndexedOrderedDict()
-CONTEXTS['morning'] = {'exe': os.path.join('blender','morning.blend'),
-                         'start_dt': datetime.strptime("2016-02-01 08-00-00", "%Y-%m-%d %H-%M-%S")}
-CONTEXTS['evening'] = {'exe': os.path.join('blender', 'evening.blend'),
-                         'start_dt': datetime.strptime("2016-02-01 18-00-00", "%Y-%m-%d %H-%M-%S")}
+
+# Contexts are loaded from blender file as files with .blend extension
+file_list = os.listdir('blender')
+for f in file_list :
+    if os.path.isfile(os.path.join('blender', f)) and f.lower().endswith( ('.blend') ) \
+        and not f.lower().startswith( ('apartment')):
+        context = f.replace('.blend','')
+        CONTEXTS[context] = {'exe': os.path.join('blender',f),
+                                'start_dt': datetime.strptime("2016-02-01 08-00-00", "%Y-%m-%d %H-%M-%S")}
 
 def validate_dt(value):
     try:
