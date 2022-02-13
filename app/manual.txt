@@ -1,0 +1,2 @@
+SPACE -> open the activity menu
+Z -> Show the time formarding in the activity menu

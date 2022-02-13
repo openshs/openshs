@@ -110,7 +110,7 @@ def start(context, primusrun):
     weekday_p = is_weekday(start_dt)
 
     # Write the starting datetime for blender to read
-    sf = open('blender/start_time.txt', 'w')
+    sf = open(os.path.join('blender','start_time.txt'), 'w')
     sf.write(str(int(start_dt.timestamp())))
     sf.close()
 
@@ -118,6 +118,7 @@ def start(context, primusrun):
         subprocess.call(["primusrun", "blender", CONTEXTS[context]['exe']], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     else:
         subprocess.call(["blender", CONTEXTS[context]['exe']], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    # After the simulation is complete, data stored in the output.csv file must be saved
     count = 0
     while True:
         try:
