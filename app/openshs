@@ -12,14 +12,17 @@ from collections import OrderedDict
 from indexed import IndexedOrderedDict
 import itertools
 from random import randrange, choice
+import json
 
 CONTEXTS = IndexedOrderedDict()
+CONFIG_PATH = os.path.join('config','config.json')
+CONFIG = {}
 
-# Contexts are loaded from blender file as files with .blend extension
+# Contexts are loaded from blender directory as files with .blend extension
 file_list = os.listdir('blender')
 for f in file_list :
-    if os.path.isfile(os.path.join('blender', f)) and f.lower().endswith( ('.blend') ) \
-        and not f.lower().startswith( ('apartment')):
+    if os.path.isfile(os.path.join('blender', f)) and f.lower().endswith('.blend') \
+        and not f.lower().startswith('apartment'):
         context = f.replace('.blend','')
         CONTEXTS[context] = {'exe': os.path.join('blender',f),
                                 'start_dt': datetime.strptime("2016-02-01 08-00-00", "%Y-%m-%d %H-%M-%S")}
@@ -93,9 +96,9 @@ def status(list_contexts, recorded_samples):
 
     if recorded_samples:
         for context in CONTEXTS:
-            files = glob('temp/*_' + context + '_*.csv')
-            weekdays = str(len([f for f in files if f.split('temp/')[1].startswith('weekday')]))
-            weekends = str(len([f for f in files if f.split('temp/')[1].startswith('weekend')]))
+            files = glob(os.path.join('data','*_') + context + '_*.csv')
+            weekdays = str(len([f for f in files if f.split(os.path.join('data',''))[1].startswith('weekday')]))
+            weekends = str(len([f for f in files if f.split(os.path.join('data',''))[1].startswith('weekend')]))
             click.echo("For context " + click.style(context, bold=True) + ", " + click.style('weekdays', bold=True) + ": " + weekdays + " Samples.")
             click.echo("For context " + click.style(context, bold=True) + ", " + click.style('weekends', bold=True) + ": " + weekends + " Samples.")
 
@@ -115,9 +118,12 @@ def start(context, primusrun):
     weekday_p = is_weekday(start_dt)
 
     # Write the starting datetime for blender to read
-    sf = open(os.path.join('blender','start_time.txt'), 'w')
-    sf.write(str(int(start_dt.timestamp())))
-    sf.close()
+    CONFIG['start_time'] = int(start_dt.timestamp())
+    # Serializing json 
+    json_object = json.dumps(CONFIG, indent = 4)
+    # Writing to sample.json
+    with open(CONFIG_PATH, "w") as json_file:
+        json_file.write(json_object)
 
     if primusrun:
         subprocess.call(["primusrun", "blender", CONTEXTS[context]['exe']], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
@@ -127,7 +133,7 @@ def start(context, primusrun):
     count = 0
     while True:
         try:
-            data_week_csv = os.path.join('temp', 
+            data_week_csv = os.path.join('data', 
                 ('weekday_' if weekday_p else 'weekend_') + context + '_' + datetime.strftime(start_dt, "%Y-%m-%d %H-%M-%S") +
                 ('' if not count else '_' + str(count) ) + '.csv')
             data_out_csv = os.path.join('temp', 'output.csv')
@@ -147,7 +153,7 @@ def start(context, primusrun):
 def aggregate(days, start_date, time_margin, variable_activities):
     """Aggregate the datasets."""
 
-    files = glob('temp/*.csv')
+    files = glob(os.path.join('data','*.csv'))
 
     aday = timedelta(days=1)
     dt = start_date
@@ -159,20 +165,20 @@ def aggregate(days, start_date, time_margin, variable_activities):
     header.append('timestamp')
 
     d_rows = []
-    with open('datasets/dataset.csv', 'w') as outf:
+    with open(os.path.join('datasets','dataset.csv'), 'w') as outf:
         csv_writer = csv.writer(outf)
         csv_writer.writerow(header)
 
         for _ in range(days):
             if is_weekday(dt):
                 for context in CONTEXTS:
-                    pool_files = glob('temp/weekday_' + context + '*.csv')
+                    pool_files = glob('data/weekday_' + context + '*.csv')
                     pool = SamplesPool(pool_files, variable_activities)
                     rep_rows = pool.generate_sample(header=False)
                     d_rows += add_timestamp_field(rep_rows, random_timestamp(dt, pool_files, time_margin))
             else:
                 for context in CONTEXTS:
-                    pool_files = glob('temp/weekend_' + context + '*.csv')
+                    pool_files = glob('data/weekend_' + context + '*.csv')
                     pool = SamplesPool(pool_files, variable_activities)
                     rep_rows = pool.generate_sample(header=False)
                     d_rows += add_timestamp_field(rep_rows, random_timestamp(dt, pool_files, time_margin))
