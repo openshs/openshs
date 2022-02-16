@@ -1,1 +1,1 @@
-from .samplespool import SamplesPool
+from .samplespool import *

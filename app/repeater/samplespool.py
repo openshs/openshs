@@ -1,6 +1,4 @@
-try: from repeater import take, unique_pattern_counter, extract_labels, pick_by_prob, find_activities_length, \
-    strip_sample_and_idx_from_key, randomize_reading_len
-except: pass
+from .repeater import *
 from collections import OrderedDict, Counter
 import csv
 from indexed import IndexedOrderedDict

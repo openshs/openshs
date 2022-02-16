@@ -4,7 +4,7 @@ from tkinter import messagebox
 class MenuBar:
     def __init__(self, window: Tk):
         self.window = window
-
+        self.l_boxes = None
         verbose = BooleanVar()
         verbose.set(False)
         # Method for enabling or disabling context information in hud view
@@ -26,10 +26,15 @@ class MenuBar:
         def about():
             messagebox.showinfo('Info', '...')
 
-        self.menubar = Menu(window, background='#ff8000', foreground='black', activebackground='white', activeforeground='black')  
+        self.menubar = Menu(window, foreground='black', activebackground='white', activeforeground='black')  
 
-        optionsm = Menu(self.menubar, tearoff=0, background='#ffcc99', foreground='black')  
-        optionsm.add_command(label='Generate datasets')  
+        optionsm = Menu(self.menubar, tearoff=0, foreground='black') 
+        def genDatasets():
+            window.withdraw()
+            messagebox.showinfo('Info', '...')
+            window.deiconify()
+        
+        optionsm.add_command(label='Generate datasets', command=genDatasets)  
         optionsm.add_command(label='Tests IA')    
         optionsm.add_separator()  
         optionsm.add_command(label="Exit", command=window.quit)  
