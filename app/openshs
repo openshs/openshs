@@ -25,7 +25,10 @@ for f in file_list :
         and not f.lower().startswith('apartment'):
         context = f.replace('.blend','')
         CONTEXTS[context] = {'exe': os.path.join('blender',f),
-                                'start_dt': datetime.strptime("2016-02-01 08-00-00", "%Y-%m-%d %H-%M-%S")}
+                                'start_dt': datetime.strptime(
+                                    # Current date and time in the specified format
+                                    str(datetime.today()).split('.')[0].replace(':','-'), 
+                                    "%Y-%m-%d %H-%M-%S")}
 
 def validate_dt(value):
     try:
