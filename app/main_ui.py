@@ -1,19 +1,25 @@
 from tkinter import *
 from main_ui import *
 
-window =Tk()
-window.title("OpenSHS")
-window.geometry("800x500")
+class MainUi(Tk):
+    def __init__(self):
+        super().__init__()
+        self.title("OpenSHS")
+        self.geometry("800x500")
 
-menu = MenuBar(window)
-window.config(menu=menu.menubar)
+        self.menu = MenuBar(self)
+        self.config(menu=self.menu.menubar)
 
-window.grid_columnconfigure(0,weight=1) # the text and entry frames column
-window.grid_columnconfigure(2,weight=1) # the text and entry frames column
-window.grid_columnconfigure(4,weight=1) # the text and entry frames column
-window.grid_rowconfigure(1,weight=1) # all frames row
-l_boxes = ListBoxes(window)
+        self.grid_columnconfigure(0,weight=1) # the text and entry frames column
+        self.grid_columnconfigure(2,weight=1) # the text and entry frames column
+        self.grid_columnconfigure(4,weight=1) # the text and entry frames column
+        self.grid_rowconfigure(1,weight=1) # all frames row
+        l_boxes = ListBoxes(self)
 
-menu.l_boxes = l_boxes
+        self.menu.l_boxes = l_boxes
 
-window.mainloop()
+def main():
+    MainUi().mainloop()
+
+if __name__ == '__main__':
+    main()

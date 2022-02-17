@@ -1,14 +1,16 @@
 from tkinter import *
 from tkinter import messagebox
+from .calendar_picker import *
+from .utils import *
 
 class MenuBar:
-    def __init__(self, window: Tk):
+    def __init__(self, window: Tk) :
         self.window = window
         self.l_boxes = None
         verbose = BooleanVar()
         verbose.set(False)
         # Method for enabling or disabling context information in hud view
-        def enableVerbose():
+        def enableVerbose() :
             #TODO
             pass
 
@@ -30,10 +32,22 @@ class MenuBar:
 
         optionsm = Menu(self.menubar, tearoff=0, foreground='black') 
         def genDatasets():
-            window.withdraw()
-            messagebox.showinfo('Info', '...')
+            if len(self.l_boxes.l_scnearios.curselection())!=0:
+                # Hide main window
+                window.withdraw()
+
+                # Choose date and time:
+                dtPick = DateTimePicker(self.window)
+                dtPick.wait_window()
+                if not dtPick.cancel :
+                    dt = dtPick.date+' '+dtPick.time
+                    start(self.l_boxes.l_scnearios.get(self.l_boxes.l_scnearios.curselection()[0]), dt)
+            else: 
+                messagebox.showwarning('Missing context', 
+                    'A scenario must be chosen')
+            # Show main window
             window.deiconify()
-        
+
         optionsm.add_command(label='Generate datasets', command=genDatasets)  
         optionsm.add_command(label='Tests IA')    
         optionsm.add_separator()  
