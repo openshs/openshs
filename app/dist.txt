@@ -1,0 +1,1 @@
+ pyinstaller main_ui.py --windowed --onefile --icon=./logo.ico
