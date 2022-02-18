@@ -72,11 +72,13 @@ class SamplesPool(object):
             else:
                 picked_labels.append(self.pick_labels_at(time_step, length))
 
-
+        
         # Check if we have duplicate last activity
-        if strip_sample_and_idx_from_key(picked_labels[-1]) == strip_sample_and_idx_from_key(picked_labels[-2]):
-            picked_labels.pop()
-
+        try:
+            if strip_sample_and_idx_from_key(picked_labels[-1]) == strip_sample_and_idx_from_key(picked_labels[-2]):
+                picked_labels.pop()
+        except: pass
+        
         # Check for variable activities flag
         if self.variable_activities:
             for pick in picked_labels:

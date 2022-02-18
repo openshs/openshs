@@ -1,7 +1,10 @@
 from tkinter import *
 from tkinter import messagebox
+
+from main_ui.context_popup import ContextPopup
 from .calendar_picker import *
 from .utils import *
+from .aggregate_popup import *
 
 class MenuBar:
     def __init__(self, window: Tk) :
@@ -33,30 +36,78 @@ class MenuBar:
         optionsm = Menu(self.menubar, tearoff=0, foreground='black') 
         def genDatasets():
             if len(self.l_boxes.l_scnearios.curselection())!=0:
-                # Hide main window
-                window.withdraw()
-
                 # Choose date and time:
                 dtPick = DateTimePicker(self.window)
-                dtPick.wait_window()
+                self.window.wait_window(dtPick)
                 if not dtPick.cancel :
                     dt = dtPick.date+' '+dtPick.time
-                    start(self.l_boxes.l_scnearios.get(self.l_boxes.l_scnearios.curselection()[0]), dt)
+                    # Hide main window
+                    window.withdraw()
+                    startGenData(self.l_boxes.l_scnearios.get(self.l_boxes.l_scnearios.curselection()[0]), dt)
             else: 
                 messagebox.showwarning('Missing context', 
-                    'A scenario must be chosen')
+                    'A context must be chosen')
+            # Update list boxes
+            self.l_boxes.update()
             # Show main window
             window.deiconify()
-
         optionsm.add_command(label='Generate datasets', command=genDatasets)  
-        optionsm.add_command(label='Tests IA')    
+        def testAI():
+            messagebox.showwarning('Error', 
+                        'Not implemented yet :(')
+            """
+            if len(self.l_boxes.l_ia.curselection())!=0:
+                if len(self.l_boxes.l_ia.curselection())<=5:
+                    # Choose context
+                    ctP = ContextPopup(self.window)
+                    self.window.wait_window(ctP)
+
+                    #TODO SAVE JSON CONFIG FOR EACH AI
+                    
+                    if not ctP.cancel:
+                        # Choose date and time:
+                        dtPick = DateTimePicker(self.window)
+                        self.window.wait_window(dtPick)
+                        if not dtPick.cancel :
+                            dt = dtPick.date+' '+dtPick.time
+                            # Hide main window
+                            window.withdraw()
+                            startTestAI(ctP.context, dt)
+                else: 
+                    messagebox.showwarning('Too many mechanisms AI Mechanisms', 
+                        'You can choose a maximum of 5 AI mechanisms')
+            else: 
+                messagebox.showwarning('Missing AI Mechanisms', 
+                    'An AI mechanism must be chosen')
+            """
+            # Update list boxes
+            self.l_boxes.update()
+            # Show main window
+            window.deiconify()
+        optionsm.add_command(label='Tests AI', command=testAI)    
         optionsm.add_separator()  
         optionsm.add_command(label="Exit", command=window.quit)  
         self.menubar.add_cascade(label="Options", menu=optionsm)  
 
         toolsm = Menu(self.menubar, tearoff=0)  
-        toolsm.add_command(label="Replicate datasets") 
-        toolsm.add_command(label="Train IA")
+        def replicateDS():
+            l_aux = []
+            for i in range(self.l_boxes.l_scnearios.size()):
+                l_aux.append(self.l_boxes.l_scnearios.get(i))
+            print(l_aux)
+            if(len(l_aux)):
+                agP = AgreggatePopup(self.window, l_aux)
+                self.window.wait_window(agP)
+                # Update list boxes
+                self.l_boxes.update()
+            else: 
+                messagebox.showwarning('Missing contexts', 
+                    'No context avilable')
+        toolsm.add_command(label="Replicate datasets", command=replicateDS) 
+        def trainAI():
+            messagebox.showwarning('Error', 
+                        'Not implemented yet :(')
+        toolsm.add_command(label="Train AI", command=trainAI)
         self.menubar.add_cascade(label="Tools", menu=toolsm)  
 
         configm = Menu(self.menubar, tearoff=0)

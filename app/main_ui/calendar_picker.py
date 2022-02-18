@@ -5,6 +5,10 @@ from datetime import datetime
 class DateTimePicker(Toplevel):
    def __init__(self, root) :
       super().__init__(root)
+      # Modal popup
+      self.transient(root)
+      self.grab_set()
+      self.focus_set()
       self.title("DateTime Picker")
       self.geometry("360x350")
       self.resizable(width=False, height=False)
@@ -59,7 +63,10 @@ class DateTimePicker(Toplevel):
       self.sec.place(x=200, y=270)
       
       button1= Button(self, text= "Accept", command = get_date)
-      button1.place(x=160, y=310)
+      button1.place(x=190, y=310)
+      
+      button2= Button(self, text= "Cancel", command = self.destroy)
+      button2.place(x=250, y=310)
 
    def trace_var(self,*args):
       if self.last_value == "59" and self.minstr.get() == "0":

@@ -48,7 +48,7 @@ def validate_date(value):
         raise click.BadParameter("Please enter a valid date")
 
 def random_timestamp(dt, pool_files, time_margin):
-    pool_times = [x[x.find(' ')+1:-4] for x in pool_files]
+    pool_times = [x.split(' ')[1].split('_')[0].replace('.csv','') for x in pool_files]
     times = [datetime.strptime(x, "%H-%M-%S") for x in pool_times]
     random_sample = choice(times)
     if time_margin > 0:
@@ -141,7 +141,7 @@ def start(context, primusrun):
                 ('' if not count else '_' + str(count) ) + '.csv')
             data_out_csv = os.path.join('temp', 'output.csv')
             os.rename(data_out_csv, data_week_csv)
-            click.echo('Dataset saved as  ' + data_week_csv); break
+            click.echo('Dataset saved in: ' + data_week_csv); break
         except FileExistsError:
             click.echo('File ' + data_week_csv +  ' already exists')
             count+=1
@@ -175,16 +175,18 @@ def aggregate(days, start_date, time_margin, variable_activities):
         for _ in range(days):
             if is_weekday(dt):
                 for context in CONTEXTS:
-                    pool_files = glob('data/weekday_' + context + '*.csv')
-                    pool = SamplesPool(pool_files, variable_activities)
-                    rep_rows = pool.generate_sample(header=False)
-                    d_rows += add_timestamp_field(rep_rows, random_timestamp(dt, pool_files, time_margin))
+                    pool_files = glob(os.path.join('data','weekday_' + context + '**.csv'))
+                    if len(pool_files):
+                        pool = SamplesPool(pool_files, variable_activities)
+                        rep_rows = pool.generate_sample(header=False)
+                        d_rows += add_timestamp_field(rep_rows, random_timestamp(dt, pool_files, time_margin))
             else:
                 for context in CONTEXTS:
-                    pool_files = glob('data/weekend_' + context + '*.csv')
-                    pool = SamplesPool(pool_files, variable_activities)
-                    rep_rows = pool.generate_sample(header=False)
-                    d_rows += add_timestamp_field(rep_rows, random_timestamp(dt, pool_files, time_margin))
+                    pool_files = glob(os.path.join('data','weekend_' + context + '*.csv'))
+                    if len(pool_files):
+                        pool = SamplesPool(pool_files, variable_activities)
+                        rep_rows = pool.generate_sample(header=False)
+                        d_rows += add_timestamp_field(rep_rows, random_timestamp(dt, pool_files, time_margin))
             dt += aday
 
         csv_writer.writerows(d_rows)

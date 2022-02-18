@@ -1,3 +1,2 @@
 click
 indexed==1.0.0
-pysimplegui

@@ -6,7 +6,7 @@ class MainUi(Tk):
         super().__init__()
         self.title("OpenSHS")
         self.geometry("800x500")
-
+        self.iconbitmap("logo.ico")
         self.menu = MenuBar(self)
         self.config(menu=self.menu.menubar)
 

@@ -6,7 +6,7 @@ class ListBoxes:
         self.window = window
         
         #------------------------------------------------------------------------
-        label = Label(self.window, text="Scenarios:")
+        label = Label(self.window, text="Contexts:")
         label.config(font=("Times New Roman",14))
         label.grid(column=0,row=0, padx=(30, 0), pady=(10, 0), sticky='NSWE')
 
@@ -16,7 +16,7 @@ class ListBoxes:
         label.grid(column=2,row=0, padx=(15, 0), pady=(10, 0), sticky='NSWE')
 
         #------------------------------------------------------------------------
-        label = Label(self.window, text="IA Mechanisms:")
+        label = Label(self.window, text="AI Mechanisms:")
         label.config(font=("Times New Roman",14))
         label.grid(column=4,row=0, padx=(15, 0), pady=(10, 0), sticky='NSWE')
 
@@ -30,16 +30,8 @@ class ListBoxes:
         self.scroll_sc1.grid(column=1, row=1, padx=(0, 15), sticky='NS')
         self.scroll_sc2.grid(column=0, row=2, padx=(30, 0), pady=(0, 30), sticky='WE')
         
-        self.scroll_sc1.configure(command=self.l_scnearios.yview)  
-        self.scroll_sc2.configure(command=self.l_scnearios.xview)       
-        
-        # Contexts are loaded from blender directory as files with .blend extension
-        file_list = os.listdir('blender')
-        for f in file_list :
-            if os.path.isfile(os.path.join('blender', f)) and f.lower().endswith('.blend') \
-                and not f.lower().startswith('apartment'):
-                context = f.replace('.blend','')
-                self.l_scnearios.insert(1, context)
+        self.scroll_sc1.configure(command=self.l_scnearios.yview)
+        self.scroll_sc2.configure(command=self.l_scnearios.xview)
 
         #------------------------------------------------------------------------
         self.scroll_ds1 = Scrollbar(self.window, orient=VERTICAL)
@@ -54,12 +46,7 @@ class ListBoxes:
         self.scroll_ds1.configure(command=self.l_datast.yview)
         self.scroll_ds2.configure(command=self.l_datast.xview)
         
-        # Contexts are loaded from blender directory as files with .blend extension
-        file_list = os.listdir('data')
-        for f in file_list :
-            if os.path.isfile(os.path.join('data', f)) and f.lower().endswith('.csv') :
-                data = f.replace('.csv','')
-                self.l_datast.insert(1, data)
+        
 
         #------------------------------------------------------------------------
         self.scroll_ia1 = Scrollbar(self.window, orient=VERTICAL)
@@ -74,10 +61,32 @@ class ListBoxes:
         self.scroll_ia1.configure(command=self.l_ia.yview)
         self.scroll_ia2.configure(command=self.l_ia.xview)       
         
+        self.update()
+    
+    def update(self):
+        # Clear list boxes
+        self.l_scnearios.delete(0,END)
+        self.l_datast.delete(0,END)
+        self.l_ia.delete(0,END)
+
+        # Contexts are loaded from blender directory as files with .blend extension
+        file_list = os.listdir('blender')
+        for f in file_list :
+            if os.path.isfile(os.path.join('blender', f)) and f.lower().endswith('.blend') \
+                and not f.lower().startswith('apartment'):
+                context = f.replace('.blend','')
+                self.l_scnearios.insert(1, context)
+
+        # Contexts are loaded from blender directory as files with .blend extension
+        file_list = os.listdir('data')
+        for f in file_list :
+            if os.path.isfile(os.path.join('data', f)) and f.lower().endswith('.csv') :
+                data = f.replace('.csv','')
+                self.l_datast.insert(1, data)
+        
         # Contexts are loaded from blender directory as files with .blend extension
         file_list = os.listdir('ia_mech')
         for f in file_list :
             if os.path.isfile(os.path.join('ia_mech', f)) and f.lower().endswith('.json') :
                 data = f.replace('.json','')
                 self.l_ia.insert(1, data)
-            
