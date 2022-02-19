@@ -1,5 +1,6 @@
 from tkinter import *
-from main_ui import *
+from main_ui.menu_bar import *
+from main_ui.list_boxes import *
 from config.config import *
 
 class MainUi(Tk):
