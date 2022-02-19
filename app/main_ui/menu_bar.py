@@ -7,15 +7,16 @@ from .utils import *
 from .aggregate_popup import *
 
 class MenuBar:
-    def __init__(self, window: Tk) :
+    def __init__(self, window: Tk, config) :
         self.window = window
         self.l_boxes = None
+        self.config = config
         verbose = BooleanVar()
         verbose.set(False)
         # Method for enabling or disabling context information in hud view
         def enableVerbose() :
-            #TODO
-            pass
+            if verbose.get() == 1: self.config.verbose = True
+            elif verbose.get() == 0: self.config.verbose = False
 
         darkmode = BooleanVar()
         darkmode.set(False)
@@ -43,7 +44,7 @@ class MenuBar:
                     dt = dtPick.date+' '+dtPick.time
                     # Hide main window
                     window.withdraw()
-                    startGenData(self.l_boxes.l_scnearios.get(self.l_boxes.l_scnearios.curselection()[0]), dt)
+                    startGenData(self.l_boxes.l_scnearios.get(self.l_boxes.l_scnearios.curselection()[0]), dt, self.config)
             else: 
                 messagebox.showwarning('Missing context', 
                     'A context must be chosen')

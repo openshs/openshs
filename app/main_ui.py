@@ -1,5 +1,6 @@
 from tkinter import *
 from main_ui import *
+from config.config import *
 
 class MainUi(Tk):
     def __init__(self):
@@ -7,7 +8,7 @@ class MainUi(Tk):
         self.title("OpenSHS")
         self.geometry("800x500")
         self.iconbitmap("logo.ico")
-        self.menu = MenuBar(self)
+        self.menu = MenuBar(self, Config())
         self.config(menu=self.menu.menubar)
 
         self.grid_columnconfigure(0,weight=1) # the text and entry frames column

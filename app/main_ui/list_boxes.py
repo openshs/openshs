@@ -85,8 +85,8 @@ class ListBoxes:
                 self.l_datast.insert(1, data)
         
         # Contexts are loaded from blender directory as files with .blend extension
-        file_list = os.listdir('ia_mech')
+        file_list = os.listdir('ai_mech')
         for f in file_list :
-            if os.path.isfile(os.path.join('ia_mech', f)) and f.lower().endswith('.json') :
+            if os.path.isfile(os.path.join('ai_mech', f)) and f.lower().endswith('.json') :
                 data = f.replace('.json','')
                 self.l_ia.insert(1, data)

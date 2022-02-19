@@ -9,9 +9,6 @@ from random import randrange, choice
 import time
 from repeater import *
 
-CONFIG_PATH = os.path.join('config','config.json')
-CONFIG = {}
-
 def is_weekday(dt):
     if dt.weekday() < 5:
         return True
@@ -50,20 +47,16 @@ def random_date(start, end):
 """
     Method to start simulation and generate datasets
 """
-def startGenData(context, date_time):
+def startGenData(context, date_time, config):
     start_dt = datetime.strptime(date_time, 
             "%Y-%m-%d %H-%M-%S")
 
     weekday_p = is_weekday(start_dt)
 
     # Write the starting datetime for blender to read
-    CONFIG['start_time'] = int(start_dt.timestamp())
-    # Serializing json 
-    json_object = json.dumps(CONFIG, indent = 4)
-    # Writing to sample.json
-    with open(CONFIG_PATH, "w") as json_file:
-        json_file.write(json_object)
-
+    config.start_time = int(start_dt.timestamp())
+    config.save()
+    
     subprocess.call(["blender", os.path.join('blender',context+'.blend')], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, 
         shell=False)
     
@@ -86,18 +79,14 @@ def startGenData(context, date_time):
 """
     Method to start simulation and test AI
 """
-def startTestAI(context, date_time):
+def startTestAI(context, date_time, config):
     start_dt = datetime.strptime(date_time, 
             "%Y-%m-%d %H-%M-%S")
 
     # Write the starting datetime for blender to read
-    CONFIG['start_time'] = int(start_dt.timestamp())
-    # Serializing json 
-    json_object = json.dumps(CONFIG, indent = 4)
-    # Writing to sample.json
-    with open(CONFIG_PATH, "w") as json_file:
-        json_file.write(json_object)
-
+    config.start_time = int(start_dt.timestamp())
+    config.save()
+    
     subprocess.call(["blender", os.path.join('blender',context+'.blend')], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, 
         shell=False)
 
