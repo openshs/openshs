@@ -53,40 +53,7 @@ class MenuBar:
             # Show main window
             window.deiconify()
         optionsm.add_command(label='Generate datasets', command=genDatasets)  
-        def testAI():
-            messagebox.showwarning('Error', 
-                        'Not implemented yet :(')
-            """
-            if len(self.l_boxes.l_ia.curselection())!=0:
-                if len(self.l_boxes.l_ia.curselection())<=5:
-                    # Choose context
-                    ctP = ContextPopup(self.window)
-                    self.window.wait_window(ctP)
-
-                    #TODO SAVE JSON CONFIG FOR EACH AI
-                    
-                    if not ctP.cancel:
-                        # Choose date and time:
-                        dtPick = DateTimePicker(self.window)
-                        self.window.wait_window(dtPick)
-                        if not dtPick.cancel :
-                            dt = dtPick.date+' '+dtPick.time
-                            # Hide main window
-                            window.withdraw()
-                            startTestAI(ctP.context, dt)
-                else: 
-                    messagebox.showwarning('Too many mechanisms AI Mechanisms', 
-                        'You can choose a maximum of 5 AI mechanisms')
-            else: 
-                messagebox.showwarning('Missing AI Mechanisms', 
-                    'An AI mechanism must be chosen')
-            """
-            # Update list boxes
-            self.l_boxes.update()
-            # Show main window
-            window.deiconify()
-        optionsm.add_command(label='Tests AI', command=testAI)    
-        optionsm.add_separator()  
+        optionsm.add_separator()
         optionsm.add_command(label="Exit", command=window.quit)  
         self.menubar.add_cascade(label="Options", menu=optionsm)  
 
@@ -105,10 +72,6 @@ class MenuBar:
                 messagebox.showwarning('Missing contexts', 
                     'No context avilable')
         toolsm.add_command(label="Replicate datasets", command=replicateDS) 
-        def trainAI():
-            messagebox.showwarning('Error', 
-                        'Not implemented yet :(')
-        toolsm.add_command(label="Train AI", command=trainAI)
         self.menubar.add_cascade(label="Tools", menu=toolsm)  
 
         configm = Menu(self.menubar, tearoff=0)

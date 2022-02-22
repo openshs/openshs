@@ -14,7 +14,6 @@ class MainUi(Tk):
 
         self.grid_columnconfigure(0,weight=1) # the text and entry frames column
         self.grid_columnconfigure(2,weight=1) # the text and entry frames column
-        self.grid_columnconfigure(4,weight=1) # the text and entry frames column
         self.grid_rowconfigure(1,weight=1) # all frames row
         l_boxes = ListBoxes(self)
 
