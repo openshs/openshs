@@ -46,10 +46,10 @@ class DateTimePicker(Toplevel):
       self.hourstr = StringVar(self,datetime.now().hour)
       self.hour = Spinbox(self,from_=0,to=23,wrap=True,textvariable=self.hourstr,width=2,state="readonly")
 
-      self.minstr = StringVar(self,datetime.now().minute)
+      self.minstr = StringVar(self, 0)
       self.min = Spinbox(self,from_=0,to=59,wrap=True,textvariable=self.minstr,width=2)    # ,state="readonly"
       
-      self.secstr = StringVar(self, datetime.now().second)
+      self.secstr = StringVar(self, 0)
       self.sec = Spinbox(self,from_=0,to=59,wrap=True,textvariable=self.secstr,width=2) 
 
       self.last_valueSec = ""
