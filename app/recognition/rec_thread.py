@@ -1,50 +1,62 @@
 from time import sleep
-import pyttsx3 as voz
+from gtts import gTTS
 import speech_recognition as sr
 import threading
-
+from os import remove
+from pygame import mixer
 from datetime import datetime
 
 class Assistant(threading.Thread):
     def __init__(self):
         super().__init__(
             name="simulator_assistant_thread", 
-            target=self.run
+            target=self.run,
+            daemon=True
         )
-        self.__voice = voz.init()
-        voices=self.__voice.getProperty('voices')
-        self.__voice.setProperty('voice', voices[0].id)
-        self.__voice.setProperty('rate', 140)
-        self.__recognizer = sr.Recognizer()
-        self.__run = True
+
+        self.recognizer = sr.Recognizer()
+        
+        self.finish = False
 
     def run(self):
-        while self.__run:
-            try:
-                expression = self.listen()
-                if self.__run:
-                    self.__analyze(expression)
-            except: pass
+        while not self.finish:
+            expression = self.listen()
+            if not self.finish:
+                self.analyze(expression)
     
     def end(self):
-        self.__run = False
+        self.finish = True
     
     def listen(self):
         # Reading data from the microphone
         with sr.Microphone() as source:
             print('<Listening>')
-            audio = self.__recognizer.listen(source, phrase_time_limit=3)
+            audio = self.recognizer.listen(source, phrase_time_limit=2)
         
         try:
-            return self.__recognizer.recognize_google(audio, language='es-ES')
+            return self.recognizer.recognize_google(audio, language='es-ES')
         except:
-            return 'Lo siento no te entendi'
+            return 'Lo siento, puedes repetir?'
     
+    def playMP3(self) :
+        mixer.init()
+        mixer.music.load('temp.mp3')
+        mixer.music.play()
+        while mixer.music.get_busy() :
+            sleep(0.01)
+        mixer.quit()
+        remove('temp.mp3')
+        
     def say(self, text:str):
-        self.__voice.say(text)
-        self.__voice.runAndWait()
+        print(text)
+        tts = gTTS(text=text, lang="es", slow=False)
+        filename = 'temp.mp3'
+        tts.save(filename)
+        
+        self.playMP3()
+        
 
-    def __analyze(self, text:str):
+    def analyze(self, text:str):
         print(f'Creo que dijiste "{text}"')
 
         text=text.lower()
@@ -55,9 +67,4 @@ class Assistant(threading.Thread):
             if 'hora' in text:
                 time=datetime.now().strftime('%H:%M')
                 self.say(f'Son las {time}')
-        else : self.say(text)
-
-asdsada = Assistant()
-asdsada.start()
-sleep(1)
-asdsada.join()
+        else : self.say("Lo siento, puedes repetir?")
