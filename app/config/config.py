@@ -10,14 +10,30 @@ class Config:
             # Reading current config.json
             with open(self.CONFIG_PATH, "r") as json_file:
                 json_object = json.load(json_file)
+            self.language = json_object['language']
             self.start_time = json_object['start_time']
             self.verbose = json_object['verbose']
             self.contexts = json_object['contexts']
+            self.interactive = json_object['interactive']
         except:
             print("Error loading config.json file")
-            self.start_time = None
-            self.verbose = datetime.now()
+            self.language = "es"
+            self.start_time = datetime.now()
+            self.verbose = False
             self.contexts = []
+            self.interactive = []
+
+    """
+        Get the language parameter
+    """
+    def getLanguage(self):
+        return self.language
+
+    """
+        Update the language parameter
+    """
+    def setLanguage(self, lg: int):
+        self.language = lg
 
     """
         Get the start_time parameter
@@ -56,15 +72,28 @@ class Config:
         self.contexts.append(cnt)
 
     """
+        Get the interactive contexts parameter
+    """
+    def getInteractive(self):
+        return self.interactive
+
+    """
+        Add a new interactive context
+    """
+    def addInteractive(self, cnt: str):
+        self.interactive.append(cnt)
+
+    """
         Method to save the configuration in the config.json file
     """
     def save(self):
         aux = {}
+        aux['language'] = self.language
         aux['start_time'] = self.start_time
         aux['verbose'] = self.verbose
         aux['contexts'] = self.contexts
+        aux['interactive'] = self.interactive
 
         json_object = json.dumps(aux, indent = 4)
-        # Writing to sample.json
         with open(self.CONFIG_PATH, "w") as json_file:
             json_file.write(json_object)

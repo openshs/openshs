@@ -88,8 +88,6 @@ def startIntMode(context, date_time, custom_config: Config):
     start_dt = datetime.strptime(date_time, 
             "%Y-%m-%d %H-%M-%S")
 
-    weekday_p = is_weekday(start_dt)
-
     # Write the starting datetime for blender to read
     custom_config.setStartTime(int(start_dt.timestamp()))
     custom_config.save()
@@ -101,22 +99,6 @@ def startIntMode(context, date_time, custom_config: Config):
     subprocess.call(["blender", bl_file], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, 
         shell=False)
     assistant.end()
-
-    # After the simulation is complete, data stored in the output.csv file must be saved
-    count = 0
-    while True:
-        try:
-            data_week_csv = os.path.join('data', 
-                ('weekday_' if weekday_p else 'weekend_') + context + '_' + datetime.strftime(start_dt, "%Y-%m-%d %H-%M-%S") +
-                ('' if not count else '_' + str(count) ) + '.csv')
-            data_out_csv = os.path.join('temp', 'output.csv')
-            os.rename(data_out_csv, data_week_csv)
-            messagebox.showinfo('Info', 'Dataset saved in: ' + data_week_csv); break
-        except FileExistsError:
-            messagebox.showinfo('Info', 'File ' + data_week_csv +  ' already exists')
-            count+=1
-        except FileNotFoundError:
-            messagebox.showinfo('Info', 'Ungenerated dataset'); break
     return True
 
 """

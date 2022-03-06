@@ -1,10 +1,14 @@
 {
-    "start_time": 1646571600,
-    "verbose": false,
+    "language": "es",
+    "start_time": 1646586000,
+    "verbose": true,
     "contexts": [
         "morning",
         "evening",
         "test1",
         "test2"
+    ],
+    "interactive": [
+        "test1"
     ]
 }

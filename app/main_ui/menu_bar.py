@@ -60,21 +60,25 @@ class MenuBar:
         # Function for openning the simulator in interactive mode
         def interactiveMode():
             if len(self.__l_boxes.getLEscenarios().curselection())!=0:
-                # Choose date and time:
-                dtPick = DateTimePicker(self.__window)
-                self.__window.wait_window(dtPick)
-                if not dtPick.cancel :
-                    dt = dtPick.date+' '+dtPick.time
-                    # Hide main window
-                    self.__window.withdraw()
-                    flag = startIntMode(
-                        self.__l_boxes.getLEscenarios().get(
-                            self.__l_boxes.getLEscenarios().curselection()[0]), 
-                        dt, 
-                        self.__custom_config
-                    )
-                    if not flag: messagebox.showwarning('Wrong context', 
-                        'The selected context does not refer to a blender file') 
+                selection = self.__l_boxes.getLEscenarios().get(
+                            self.__l_boxes.getLEscenarios().curselection()[0])
+                if selection in self.__custom_config.getInteractive():
+                    # Choose date and time:
+                    dtPick = DateTimePicker(self.__window)
+                    self.__window.wait_window(dtPick)
+                    if not dtPick.cancel :
+                        dt = dtPick.date+' '+dtPick.time
+                        # Hide main window
+                        self.__window.withdraw()
+                        flag = startIntMode(
+                            selection, 
+                            dt, 
+                            self.__custom_config
+                        )
+                        if not flag: messagebox.showwarning('Wrong context', 
+                            'The selected context does not refer to a blender file') 
+                else: messagebox.showwarning('Wrong context', 
+                        'The selected context does not support interactive mode') 
             else: 
                 messagebox.showwarning('Missing context', 
                     'A context must be chosen')
