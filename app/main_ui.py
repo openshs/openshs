@@ -9,15 +9,21 @@ class MainUi(Tk):
         self.title("OpenSHS")
         self.geometry("800x500")
         self.iconbitmap("logo.ico")
-        self.menu = MenuBar(self, Config())
-        self.config(menu=self.menu.menubar)
+        
+        # Load custom settings for simulation
+        custom_config = Config()
 
-        self.grid_columnconfigure(0,weight=1) # the text and entry frames column
-        self.grid_columnconfigure(2,weight=1) # the text and entry frames column
-        self.grid_rowconfigure(1,weight=1) # all frames row
-        l_boxes = ListBoxes(self)
+        self.__menu = MenuBar(self, custom_config)
+        self.config(menu=self.__menu.getMenuBar())
 
-        self.menu.l_boxes = l_boxes
+        # Grid spaces are adjusted for components
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(2, weight=1)
+        self.grid_rowconfigure(1, weight=1)
+        l_boxes = ListBoxes(self, custom_config)
+
+        # MenuBar can make changes to ListBoxes
+        self.__menu.setListBoxes(l_boxes)
 
 def main():
     MainUi().mainloop()

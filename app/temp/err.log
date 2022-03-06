@@ -1,3 +1,0 @@
-Traceback (most recent call last):
-  File "hud_verbose.py", line 20, in main
-NameError: name 'json' is not defined

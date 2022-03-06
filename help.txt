@@ -1,0 +1,3 @@
+Turn on lamp from external scripts
+logic.getCurrentScene().objects['lamp'].energy = 1.0
+logic.states['betTableLamp'] = 1

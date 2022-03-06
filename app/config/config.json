@@ -1,4 +1,10 @@
 {
-    "start_time": 1645601831,
-    "verbose": false
+    "start_time": 1646560800,
+    "verbose": false,
+    "contexts": [
+        "morning",
+        "evening",
+        "test1",
+        "test2"
+    ]
 }

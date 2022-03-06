@@ -7,6 +7,8 @@ from tkinter import messagebox
 from glob import glob
 from random import randrange, choice
 import time
+from config.config import Config
+from recognition.rec_thread import Assistant
 from repeater import *
 
 def is_weekday(dt):
@@ -45,19 +47,21 @@ def random_date(start, end):
     return start + timedelta(seconds=random_second)
 
 """
-    Method to start simulation and generate datasets
+    Function to start simulation and generate datasets
 """
-def startGenData(context, date_time, config):
+def startGenData(context, date_time, custom_config: Config):
     start_dt = datetime.strptime(date_time, 
             "%Y-%m-%d %H-%M-%S")
 
     weekday_p = is_weekday(start_dt)
 
     # Write the starting datetime for blender to read
-    config.start_time = int(start_dt.timestamp())
-    config.save()
+    custom_config.setStartTime(int(start_dt.timestamp()))
+    custom_config.save()
     
-    subprocess.call(["blender", os.path.join('blender',context+'.blend')], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, 
+    bl_file = os.path.join('blender',context+'.blend')
+    if not os.path.isfile(bl_file): return False 
+    subprocess.call(["blender", bl_file], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, 
         shell=False)
     
     # After the simulation is complete, data stored in the output.csv file must be saved
@@ -75,23 +79,48 @@ def startGenData(context, date_time, config):
             count+=1
         except FileNotFoundError:
             messagebox.showinfo('Info', 'Ungenerated dataset'); break
+    return True
 
 """
-    Method to start simulation and test AI
+    Function to start simulation in interactive mode
 """
-def startTestAI(context, date_time, config):
+def startIntMode(context, date_time, custom_config: Config):
     start_dt = datetime.strptime(date_time, 
             "%Y-%m-%d %H-%M-%S")
 
+    weekday_p = is_weekday(start_dt)
+
     # Write the starting datetime for blender to read
-    config.start_time = int(start_dt.timestamp())
-    config.save()
+    custom_config.setStartTime(int(start_dt.timestamp()))
+    custom_config.save()
     
-    subprocess.call(["blender", os.path.join('blender',context+'.blend')], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, 
+    bl_file = os.path.join('blender',context+'.blend')
+    if not os.path.isfile(bl_file): return False 
+
+    assistant = Assistant(); assistant.start()
+    subprocess.call(["blender", bl_file], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, 
         shell=False)
+    assistant.end()
+
+    # After the simulation is complete, data stored in the output.csv file must be saved
+    count = 0
+    while True:
+        try:
+            data_week_csv = os.path.join('data', 
+                ('weekday_' if weekday_p else 'weekend_') + context + '_' + datetime.strftime(start_dt, "%Y-%m-%d %H-%M-%S") +
+                ('' if not count else '_' + str(count) ) + '.csv')
+            data_out_csv = os.path.join('temp', 'output.csv')
+            os.rename(data_out_csv, data_week_csv)
+            messagebox.showinfo('Info', 'Dataset saved in: ' + data_week_csv); break
+        except FileExistsError:
+            messagebox.showinfo('Info', 'File ' + data_week_csv +  ' already exists')
+            count+=1
+        except FileNotFoundError:
+            messagebox.showinfo('Info', 'Ungenerated dataset'); break
+    return True
 
 """
-    Method to group simulation data into a dataset file
+    Function to group simulation data into a dataset file
 """
 def aggregate(contexts, days, start_date, time_margin, variable_activities, progress_bar, ws):
     files = glob(os.path.join('data','*.csv'))
