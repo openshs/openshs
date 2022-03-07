@@ -1,14 +1,13 @@
 {
     "language": "es",
-    "start_time": 1646640000,
+    "start_time": 1646650800,
     "verbose": true,
     "contexts": [
         "morning",
         "evening",
-        "test1",
-        "test2"
+        "morning_new"
     ],
     "interactive": [
-        "test1"
+        "morning_new"
     ]
 }
