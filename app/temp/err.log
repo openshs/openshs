@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "hud_verbose.py", line 75, in testLights
+KeyError: "CList[key]: ''hallwayLight'' key not in list"
+{'hallwayLight': 1, 'officeLight': 1, 'bathroomLight': 1, 'livingLight': 1, 'kitchenLight': 1, 'bedroomLight': 1}

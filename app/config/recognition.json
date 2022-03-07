@@ -1,0 +1,31 @@
+{
+    "es": {
+        "name": "asistente",
+        "requests": {
+            "lights_off": {
+                "type": "command",
+                "tags": [
+                    "apaga",
+                    "luces"
+                ],
+                "samples": [
+                    "apaga las luces"
+                ],
+                "cmd": "SHT-L",
+                "response":"Luces apagadas" 
+            },
+            "lights_on": {
+                "type": "command",
+                "tags": [
+                    "enciende",
+                    "luces"
+                ],
+                "samples": [
+                    "enciende las luces"
+                ],
+                "cmd": "STT-L",
+                "response":"Luces encendidas" 
+            }
+        }
+    }
+}
