@@ -6,6 +6,7 @@ import os
 from pygame import mixer
 from datetime import datetime
 import json
+import traceback
 
 class Assistant(threading.Thread):
     def __init__(self):
@@ -22,7 +23,9 @@ class Assistant(threading.Thread):
             with open(path, "r") as json_file:
                 json_object = json.load(json_file)
             self.custom_config = json_object[self.language]
-        except: self.keep_running = False
+        except: 
+            self.keep_running = False
+            print(traceback.format_exc())
 
     """
         This method waits until the "listen" parameter in the temp.json file is set to true, 
@@ -40,9 +43,10 @@ class Assistant(threading.Thread):
                 if not listen: sleep(0.01)
             except:
                 print("Error loading temp.json file")
+                print(traceback.format_exc())
                 self.keep_running = False; break
             
-            #if prev_listen != listen and listen: self.playStart()
+            if prev_listen != listen and listen: self.playStart()
             
             if listen: 
                 expression = self.listen()
@@ -50,7 +54,7 @@ class Assistant(threading.Thread):
                 if self.keep_running and listen:
                     self.analyze(expression)
             
-            #if prev_listen != listen and not listen: self.playEnd()
+            if prev_listen != listen and not listen: self.playEnd()
             prev_listen = listen
         print('Assitant: Ending execution')
     
@@ -60,6 +64,9 @@ class Assistant(threading.Thread):
     def end(self):
         self.keep_running = False
 
+    """
+        Check the "listen" parameter in the "temp.json" file 
+    """
     def should_listen(self) -> bool:
         path = os.path.join('config','temp.json')
         # Reading current temp.json
@@ -67,23 +74,34 @@ class Assistant(threading.Thread):
             json_object = json.load(json_file)
         return json_object['listen']
     
+    """
+        Recognizes input audio over microphone and passes it 
+        to text
+    """
     def listen(self):
         # Reading data from the microphone
         with sr.Microphone() as source:
             print('<Listening>')
             audio = self.recognizer.listen(source, phrase_time_limit=2)
         try:
-            return self.recognizer.recognize_google(audio, language='es-ES')
+            return self.recognizer.recognize_google(audio, 
+                language='es-ES')
         except: return '-'
     
-    def playMP3(self):
+    """
+        Play the temporary file in mp3 format
+    """
+    def playTemp(self):
         mixer.init()
-        mixer.music.load('temp.mp3')
+        mixer.music.load(os.path.join('temp','tmp.mp3'))
         mixer.music.play()
         while mixer.music.get_busy(): sleep(0.01)
         mixer.quit()
-        #os.remove('temp.mp3')
+        #os.remove('tmp.mp3')
 
+    """
+        Play the startup file in mp3 format
+    """
     def playStart(self):
         mixer.init()
         mixer.music.load(os.path.join('recognition','sounds','start.mp3'))
@@ -91,6 +109,9 @@ class Assistant(threading.Thread):
         while mixer.music.get_busy(): sleep(0.01)
         mixer.quit()
     
+    """
+        Play the end file in mp3 format
+    """
     def playEnd(self):
         mixer.init()
         mixer.music.load(os.path.join('recognition','sounds','end.mp3'))
@@ -98,12 +119,19 @@ class Assistant(threading.Thread):
         while mixer.music.get_busy(): sleep(0.01)
         mixer.quit()
     
+    """
+        Using gTTS library changes text to speech and saves it into a
+        temporary file
+    """
     def say(self, text:str):
         tts = gTTS(text=text, lang=self.language, slow=False)
-        tts.save('temp.mp3')
-        
-        self.playMP3()
-        
+        tts.save(os.path.join('temp','tmp.mp3'))
+        self.playTemp()
+
+    """
+        Analyzes a text according to the configuration defined 
+        in the recognition.json file and reacts
+    """  
     def analyze(self, text:str):
         # In case an expression is not received, nothing should be done
         if text == '-': return
@@ -129,6 +157,10 @@ class Assistant(threading.Thread):
 
         else: self.say((f'Creo que dijiste "{text}"'))
     
+    """
+        According on the command that is passed as input it will do 
+        implemented functions
+    """
     def execute(self, cmd: str):
         path = os.path.join('temp','devices.json')
         with open(path, "r") as json_file:
