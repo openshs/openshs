@@ -63,20 +63,14 @@ class MenuBar:
                 selection = self.__l_boxes.getLEscenarios().get(
                             self.__l_boxes.getLEscenarios().curselection()[0])
                 if selection in self.__custom_config.getInteractive():
-                    # Choose date and time:
-                    dtPick = DateTimePicker(self.__window)
-                    self.__window.wait_window(dtPick)
-                    if not dtPick.cancel :
-                        dt = dtPick.date+' '+dtPick.time
-                        # Hide main window
-                        self.__window.withdraw()
-                        flag = startIntMode(
-                            selection, 
-                            dt, 
-                            self.__custom_config
-                        )
-                        if not flag: messagebox.showwarning('Wrong context', 
-                            'The selected context does not refer to a blender file') 
+                    # Hide main window
+                    self.__window.withdraw()
+                    flag = startIntMode(
+                        selection, 
+                        self.__custom_config
+                    )
+                    if not flag: messagebox.showwarning('Wrong context', 
+                        'The selected context does not refer to a blender file') 
                 else: messagebox.showwarning('Wrong context', 
                         'The selected context does not support interactive mode') 
             else: 

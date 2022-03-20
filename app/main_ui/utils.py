@@ -84,12 +84,9 @@ def startGenData(context, date_time, custom_config: Config):
 """
     Function to start simulation in interactive mode
 """
-def startIntMode(context, date_time, custom_config: Config):
-    start_dt = datetime.strptime(date_time, 
-            "%Y-%m-%d %H-%M-%S")
-
+def startIntMode(context, custom_config: Config):
     # Write the starting datetime for blender to read
-    custom_config.setStartTime(int(start_dt.timestamp()))
+    custom_config.setStartTime(int(datetime.now().timestamp()))
     custom_config.save()
     
     bl_file = os.path.join('blender',context+'.blend')

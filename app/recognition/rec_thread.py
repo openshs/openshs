@@ -37,25 +37,25 @@ class Assistant(threading.Thread):
         # In case the file does not exist, a default configuration is loaded
         prev_listen = False
         while self.keep_running:
-            listen = False
+            s_listen = False
             try:
-                listen = self.should_listen()
-                if not listen: sleep(0.01)
+                s_listen = self.should_listen()
+                if not s_listen: sleep(0.01)
             except:
                 print("Error loading temp.json file")
                 print(traceback.format_exc())
                 self.keep_running = False; break
             
-            if prev_listen != listen and listen: self.playStart()
+            if prev_listen != s_listen and s_listen: self.playStart()
             
-            if listen: 
+            if s_listen: 
                 expression = self.listen()
-                listen = self.should_listen()
-                if self.keep_running and listen:
+                s_listen = self.should_listen()
+                if self.keep_running and s_listen:
                     self.analyze(expression)
             
-            if prev_listen != listen and not listen: self.playEnd()
-            prev_listen = listen
+            if prev_listen != s_listen and not s_listen: self.playEnd()
+            prev_listen = s_listen
         print('Assitant: Ending execution')
     
     """
@@ -69,10 +69,14 @@ class Assistant(threading.Thread):
     """
     def should_listen(self) -> bool:
         path = os.path.join('config','temp.json')
-        # Reading current temp.json
-        with open(path, "r") as json_file:
-            json_object = json.load(json_file)
-        return json_object['listen']
+        try:
+            # Reading current temp.json
+            with open(path, "r") as json_file:
+                json_object = json.load(json_file)
+            return json_object['listen']
+        except:
+            print("Error reading listen field in json")
+            return False
     
     """
         Recognizes input audio over microphone and passes it 
@@ -82,7 +86,9 @@ class Assistant(threading.Thread):
         # Reading data from the microphone
         with sr.Microphone() as source:
             print('<Listening>')
-            audio = self.recognizer.listen(source, phrase_time_limit=2)
+            try:
+                audio = self.recognizer.listen(source, phrase_time_limit=4, timeout=1)
+            except sr.WaitTimeoutError: return '-'
         try:
             return self.recognizer.recognize_google(audio, 
                 language='es-ES')
@@ -155,7 +161,7 @@ class Assistant(threading.Thread):
             #for req in self.custom_config["requests"]:
             # TODO   
 
-        else: self.say((f'Creo que dijiste "{text}"'))
+            else: self.say('Creo que dijiste, '+text)
     
     """
         According on the command that is passed as input it will do 
