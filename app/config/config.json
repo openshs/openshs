@@ -1,7 +1,7 @@
 {
     "language": "es",
-    "start_time": 1647791521,
-    "verbose": true,
+    "start_time": 1648318370,
+    "verbose": false,
     "contexts": [
         "morning",
         "evening",

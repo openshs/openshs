@@ -1,3 +1,0 @@
-Traceback (most recent call last):
-  File "hud_verbose.py", line 19, in main
-AttributeError: module 'GameLogic' has no attribute 'verbose'

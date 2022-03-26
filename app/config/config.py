@@ -12,7 +12,7 @@ class Config:
                 json_object = json.load(json_file)
             self.language = json_object['language']
             self.start_time = json_object['start_time']
-            self.verbose = json_object['verbose']
+            self.verbose = False
             self.contexts = json_object['contexts']
             self.interactive = json_object['interactive']
         except:
@@ -22,7 +22,23 @@ class Config:
             self.verbose = False
             self.contexts = []
             self.interactive = []
+        
+        self.initTempConfig()
 
+    """
+        Initializes temp.json fields to default values
+    """
+    def initTempConfig(self):
+        # Setting fields for temp.json file
+        json_object = {
+            'listen': False,
+            'console_dev': ""
+        }
+        tempC = os.path.join('config','temp.json')
+        json_object = json.dumps(json_object, indent = 4)
+        with open(tempC, "w") as json_file:
+            json_file.write(json_object)
+    
     """
         Get the language parameter
     """

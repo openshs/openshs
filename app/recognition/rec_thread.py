@@ -142,33 +142,35 @@ class Assistant(threading.Thread):
         # In case an expression is not received, nothing should be done
         if text == '-': return
         
-        text=text.lower()
+        text = text.lower()
         
         if self.custom_config["name"] in text:
-            if 'hora' in text:
+            # Assistant´s name is removed
+            text = text.replace(self.custom_config["name"], '')
+            
+            # Extract requests dictionary
+            requests = self.custom_config["requests"]
+
+            if 'hora' in text and len(text.split(' ')) <= 5:
                 time=datetime.now().strftime('%H:%M')
                 self.say(f'Son las {time}')
-            elif 'luces' in text and 'apaga' in text:
-                self.execute(
-                    self.custom_config["requests"]["lights_off"]["cmd"])
-                self.say(
-                    self.custom_config["requests"]["lights_off"]["response"])
-            elif 'luces' in text and 'enciende' in text:
-                self.execute(
-                    self.custom_config["requests"]["lights_on"]["cmd"])
-                self.say(
-                    self.custom_config["requests"]["lights_on"]["response"])
-            #for req in self.custom_config["requests"]:
-            # TODO   
-
-            else: self.say('Creo que dijiste, '+text)
+                return
+            for req in requests:
+                tags = requests[req]['tags']
+                if all(t in text for t in tags):
+                    if requests[req]['type'] == 'command':
+                        self.execute(requests[req]["cmd"])
+                    if 'response' in requests[req]:
+                        self.say(requests[req]['response'])
+                    return
+            self.say('Creo que dijiste, '+text)
     
     """
         According on the command that is passed as input it will do 
         implemented functions
     """
     def execute(self, cmd: str):
-        path = os.path.join('temp','devices.json')
+        path = os.path.join('config','devices.json')
         with open(path, "r") as json_file:
             devices = json.load(json_file)
         if cmd =="SHT-L":

@@ -1,6 +1,6 @@
 {
     "es": {
-        "name": "",
+        "name": "asistente",
         "requests": {
             "lights_off": {
                 "type": "command",
