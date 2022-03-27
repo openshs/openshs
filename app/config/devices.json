@@ -1,8 +1,8 @@
 {
-    "bathroomLight": 0,
-    "officeLight": 0,
+    "livingLight": 0,
     "hallwayLight": 0,
-    "bedroomLight": 0,
+    "officeLight": 0,
     "kitchenLight": 0,
-    "livingLight": 0
+    "bathroomLight": 0,
+    "bedroomLight": 0
 }

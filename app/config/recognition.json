@@ -11,7 +11,7 @@
                 "samples": [
                     "apaga las luces"
                 ],
-                "cmd": "SHT-L",
+                "cmd": "D-SHT-L",
                 "response":"Luces apagadas" 
             },
             "lights_on": {
@@ -23,8 +23,20 @@
                 "samples": [
                     "enciende las luces"
                 ],
-                "cmd": "STT-L",
+                "cmd": "D-STT-L",
                 "response":"Luces encendidas" 
+            },
+            "write_board": {
+                "type": "command",
+                "tags": [
+                    "escribe",
+                    "consola"
+                ],
+                "samples": [
+                    "escribe en la consola"
+                ],
+                "cmd": "WRT-B",
+                "response":"se ha escrito en la consola" 
             }
         }
     }

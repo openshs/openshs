@@ -159,7 +159,7 @@ class Assistant(threading.Thread):
                 tags = requests[req]['tags']
                 if all(t in text for t in tags):
                     if requests[req]['type'] == 'command':
-                        self.execute(requests[req]["cmd"])
+                        self.execute(requests[req]["cmd"], text)
                     if 'response' in requests[req]:
                         self.say(requests[req]['response'])
                     return
@@ -169,22 +169,37 @@ class Assistant(threading.Thread):
         According on the command that is passed as input it will do 
         implemented functions
     """
-    def execute(self, cmd: str):
-        path = os.path.join('config','devices.json')
-        with open(path, "r") as json_file:
-            devices = json.load(json_file)
-        if cmd =="SHT-L":
-            for dev in devices:
-                aux = str(dev).lower()
-                if 'light' in aux or 'lamp' in aux:
-                    devices[dev] = 0
-        elif cmd =="STT-L":
-            for dev in devices:
-                aux = str(dev).lower()
-                if 'light' in aux or 'lamp' in aux:
-                    devices[dev] = 1
-        json_object = json.dumps(devices, indent = 4)
-        with open(path, "w") as json_file:
-            json_file.write(json_object)
+    def execute(self, cmd: str, text:str):
+        if cmd.startswith('D-'):
+            path = os.path.join('config','devices.json')
+            with open(path, "r") as json_file:
+                devices = json.load(json_file)
+            if cmd =="D-SHT-L":
+                for dev in devices:
+                    aux = str(dev).lower()
+                    if 'light' in aux or 'lamp' in aux:
+                        devices[dev] = 0
+            elif cmd =="D-STT-L":
+                for dev in devices:
+                    aux = str(dev).lower()
+                    if 'light' in aux or 'lamp' in aux:
+                        devices[dev] = 1
+            json_object = json.dumps(devices, indent = 4)
+            with open(path, "w") as json_file:
+                json_file.write(json_object)
+        elif cmd =="WRT-B":
+            path = os.path.join('config','temp.json')
+            # Reading current recognition.json
+            with open(path, "r") as json_file:
+                json_object = json.load(json_file)
+            if len(text.split('consola que ')) > 1:
+                out_text = text.split('consola que ')[1]
+            elif len(text.split('consola ')) > 1:
+                out_text = text.split('consola ')[1]
+            else: out_text = text
+            json_object["console_dev"] = out_text
+            json_object = json.dumps(json_object, indent = 4)
+            with open(path, "w") as json_file:
+                json_file.write(json_object)
         
 
