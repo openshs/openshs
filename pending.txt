@@ -1,7 +1,0 @@
-Fichero json que contenga un "name" que sera la palabra clave que se usará para escuchar lo que dice el usuario y un "uttrances" que seran las distintas opciones de expresión
-
-Posibles ajustes adicionales como tipo de voz, etc
-
-Opcion de ingles y español desde la interfaz (tambien para el asistente)
-
-Interfaz para añadir contextos al json y ponerlos como interactivos o no
