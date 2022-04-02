@@ -1,4 +1,4 @@
 {
-    "listen": false,
-    "console_dev": "hola"
+    "console_dev": "hola",
+    "listen": false
 }

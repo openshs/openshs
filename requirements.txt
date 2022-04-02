@@ -3,3 +3,4 @@ indexed==1.0.0
 pygame
 gtts
 SpeechRecognition
+translate

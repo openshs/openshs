@@ -2,6 +2,7 @@ from tkinter import *
 from main_ui.menu_bar import *
 from main_ui.list_boxes import *
 from config.config import *
+from config.translations import Translations
 import subprocess
 import sys
 
@@ -14,8 +15,10 @@ class MainUi(Tk):
         
         # Load custom settings for simulation
         custom_config = Config()
+        # Load transaltions
+        translations = Translations()
 
-        self.__menu = MenuBar(self, custom_config)
+        self.__menu = MenuBar(self, custom_config, translations)
         self.config(menu=self.__menu.getMenuBar())
 
         # Grid spaces are adjusted for components

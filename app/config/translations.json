@@ -1,0 +1,196 @@
+{
+    "es": {
+        "es": "español",
+        "en": "spanish"
+    },
+    "en": {
+        "es": "ingles",
+        "en": "english"
+    },
+    "Simulation": {
+        "es": "Simulación",
+        "en": "Simulation"
+    },
+    "Tools": {
+        "es": "Herramientas",
+        "en": "Tools"
+    },
+    "Config": {
+        "es": "Configuración",
+        "en": "Config"
+    },
+    "Lang": {
+        "es": "Idioma",
+        "en": "Language"
+    },
+    "Help": {
+        "es": "Ayuda",
+        "en": "Help"
+    },
+    "Exit": {
+        "es": "Salir",
+        "en": "Exit"
+    },
+    "Contexts": {
+        "es": "Contextos",
+        "en": "Contexts"
+    },
+    "DataGen": {
+        "es": "Generación de datos",
+        "en": "Datasets generation"
+    },
+    "IntMode": {
+        "es": "Modo interactivo",
+        "en": "Interactive mode"
+    },
+    "RepData": {
+        "es": "Replicar datos",
+        "en": "Replicate datasets"
+    },
+    "EnVerb": {
+        "es": "Habilitar verbosidad",
+        "en": "Enable verbose"
+    },
+    "Info": {
+        "es": "Información",
+        "en": "Info"
+    },
+    "Info1": {
+        "es": "...",
+        "en": "..."
+    },
+    "MissCont": {
+        "es": "Falta contexto",
+        "en": "Missing context"
+    },
+    "MissContInfo1": {
+        "es": "Debes escoger un contexto",
+        "en": "A context must be chosen"
+    },
+    "MissContInfo2": {
+        "es": "No hay contextos disponibles",
+        "en": "No context avilable"
+    },
+    "WrCont": {
+        "es": "Contexto incorrecto",
+        "en": "Wrong context"
+    },
+    "WrContInfo1": {
+        "es": "El contexto seleccionado no se relaciona con un fichero blender",
+        "en": "The selected context does not refer to a blender file"
+    },
+    "WrContInfo2": {
+        "es": "El contexto seleccionado no soporta el modo interactivo",
+        "en": "The selected context does not support interactive mode"
+    },
+    "AggData": {
+        "es": "Datos agregados",
+        "en": "Aggregate datasets"
+    },
+    "ChDate": {
+        "es": "Escoge una fecha:",
+        "en": "Choose date:"
+    },
+    "ChTime": {
+        "es": "Escoge el horario (horas | minutos | segundos):",
+        "en": "Choose time (hours | minutes | seconds):"
+    },
+    "NumDays": {
+        "es": "Número de días:",
+        "en": "Number of days:"
+    },
+    "MarMinutes": {
+        "es": "Minutos de margen:",
+        "en": "Margin minutes:"
+    },
+    "VarAct": {
+        "es": "Actividades variables",
+        "en": "Variable activities"
+    },
+    "Accept": {
+        "es": "Aceptar",
+        "en": "Accept"
+    },
+    "Cancel": {
+        "es": "Cancelar",
+        "en": "Cancel"
+    },
+
+
+    "GetUp": {
+        "es": "¿Levantarse?",
+        "en": "Get up?"
+    },
+    "LayDown": {
+        "es": "¿Acostarse?",
+        "en": "Lay down?"
+    },
+    "SitDown": {
+        "es": "¿Sentarse?",
+        "en": "Sit down?"
+    },
+    "ClFridge": {
+        "es": "¿Cerrar nevera?",
+        "en": "Close fridge?"
+    },
+    "OpFridge": {
+        "es": "¿Abrir nevera?",
+        "en": "Open fridge?"
+    },
+    "OnBedLamp": {
+        "es": "¿Encender lámpara?",
+        "en": "Turn the lamp on?"
+    },
+    "OffBedLamp": {
+        "es": "¿Apagar lámpara?",
+        "en": "Turn the lamp off?"
+    },
+    "OnAssistant": {
+        "es": "¿Encender el asistente?",
+        "en": "Turn the assistant on?"
+    },
+    "OffAssistant": {
+        "es": "¿Apagar el asistente?",
+        "en": "Turn the assistant off?"
+    },
+    "OnLht": {
+        "es": "¿Encender la luz?",
+        "en": "Turn the light on?"
+    },
+    "OffLht": {
+        "es": "¿Apagar la luz?",
+        "en": "Turn the light off?"
+    },
+    "OnLhtMap": {
+        "es": "¿Encender la luz del {}?",
+        "en": "Turn the {} light on?"
+    },
+    "OffLhtMap": {
+        "es": "¿Apagar la luz del {}?",
+        "en": "Turn the {} light off?"
+    },
+    "OfficeWork": {
+        "es": "¿Trabajar?",
+        "en": "Work?"
+    },
+    "OfficeStop": {
+        "es": "¿Dejar de trabajar?",
+        "en": "Stop working?"
+    },
+    "OffOven": {
+        "es": "¿Apagar el horno?",
+        "en": "Turn the oven off?"
+    },
+    "OnOven": {
+        "es": "¿Encender el horno?",
+        "en": "Turn the oven on?"
+    },
+    "OffTV": {
+        "es": "¿Apagar la TV?",
+        "en": "Turn the TV off?"
+    },
+    "OnTV": {
+        "es": "¿Encender la TV?",
+        "en": "Turn the TV on?"
+    }
+}

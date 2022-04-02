@@ -9,7 +9,7 @@ import json
 import traceback
 
 class Assistant(threading.Thread):
-    def __init__(self):
+    def __init__(self, lang : str = 'es'):
         super().__init__(
             name="simulator_assistant_thread", 
             target=self.run
@@ -17,7 +17,7 @@ class Assistant(threading.Thread):
         try:
             self.recognizer = sr.Recognizer()
             self.keep_running = True
-            self.language = "es"
+            self.language = lang
             path = os.path.join('config','recognition.json')
             # Reading current recognition.json
             with open(path, "r") as json_file:
@@ -87,11 +87,15 @@ class Assistant(threading.Thread):
         with sr.Microphone() as source:
             print('<Listening>')
             try:
+                # Listening for 4 seconds, if it does not detect variation in sound for 1 second 
+                # it will stop listening
                 audio = self.recognizer.listen(source, phrase_time_limit=4, timeout=1)
             except sr.WaitTimeoutError: return '-'
         try:
-            return self.recognizer.recognize_google(audio, 
-                language='es-ES')
+            lang = self.language
+            if self.language == 'es': lang = 'es-ES' 
+            elif self.language == 'en': lang = 'en-US'
+            return self.recognizer.recognize_google(audio, language=lang)
         except: return '-'
     
     """
@@ -130,6 +134,7 @@ class Assistant(threading.Thread):
         temporary file
     """
     def say(self, text:str):
+        print('Response: {}'.format(text))
         tts = gTTS(text=text, lang=self.language, slow=False)
         tts.save(os.path.join('temp','tmp.mp3'))
         self.playTemp()
@@ -143,6 +148,7 @@ class Assistant(threading.Thread):
         if text == '-': return
         
         text = text.lower()
+        print('Request: {}'.format(text))
         
         if self.custom_config["name"] in text:
             # Assistant´s name is removed
@@ -151,19 +157,19 @@ class Assistant(threading.Thread):
             # Extract requests dictionary
             requests = self.custom_config["requests"]
 
-            if 'hora' in text and len(text.split(' ')) <= 5:
-                time=datetime.now().strftime('%H:%M')
-                self.say(f'Son las {time}')
-                return
             for req in requests:
+                samples = requests[req]['samples']
                 tags = requests[req]['tags']
-                if all(t in text for t in tags):
+                if text in samples or all(t in text for t in tags):
                     if requests[req]['type'] == 'command':
                         self.execute(requests[req]["cmd"], text)
                     if 'response' in requests[req]:
-                        self.say(requests[req]['response'])
+                        if requests[req]['type'] == 'hour':
+                            self.say(requests[req]['response']\
+                                .format(datetime.now().strftime('%H:%M')))
+                        else:
+                            self.say(requests[req]['response'])
                     return
-            self.say('Creo que dijiste, '+text)
     
     """
         According on the command that is passed as input it will do 
@@ -192,14 +198,22 @@ class Assistant(threading.Thread):
             # Reading current recognition.json
             with open(path, "r") as json_file:
                 json_object = json.load(json_file)
-            if len(text.split('consola que ')) > 1:
-                out_text = text.split('consola que ')[1]
-            elif len(text.split('consola ')) > 1:
-                out_text = text.split('consola ')[1]
-            else: out_text = text
+            
+            if self.language == "es":
+                if len(text.split('consola que ')) > 1:
+                    out_text = text.split('consola que ')[1]
+                elif len(text.split('consola ')) > 1:
+                    out_text = text.split('consola ')[1]
+                else: out_text = text
+            elif self.language == "en":
+                if len(text.split('the console ')) > 1:
+                    out_text = text.split('the console ')[1]
+                elif len(text.split('console ')) > 1:
+                    out_text = text.split('console ')[1]
+                else: out_text = text
+
             json_object["console_dev"] = out_text
             json_object = json.dumps(json_object, indent = 4)
             with open(path, "w") as json_file:
                 json_file.write(json_object)
         
-

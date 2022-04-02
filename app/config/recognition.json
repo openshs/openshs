@@ -2,41 +2,64 @@
     "es": {
         "name": "asistente",
         "requests": {
+            "time_hour": {
+                "type": "hour",
+                "tags": [ "hora", "es" ],
+                "samples": [],
+                "response":"son las {}" 
+            },
             "lights_off": {
                 "type": "command",
-                "tags": [
-                    "apaga",
-                    "luces"
-                ],
-                "samples": [
-                    "apaga las luces"
-                ],
+                "tags": [ "apaga", "luces" ],
+                "samples": [ "apaga las luces" ],
                 "cmd": "D-SHT-L",
-                "response":"Luces apagadas" 
+                "response":"luces apagadas" 
             },
             "lights_on": {
                 "type": "command",
-                "tags": [
-                    "enciende",
-                    "luces"
-                ],
-                "samples": [
-                    "enciende las luces"
-                ],
+                "tags": [ "enciende", "luces" ],
+                "samples": [ "enciende las luces" ],
                 "cmd": "D-STT-L",
                 "response":"Luces encendidas" 
             },
             "write_board": {
                 "type": "command",
-                "tags": [
-                    "escribe",
-                    "consola"
-                ],
-                "samples": [
-                    "escribe en la consola"
-                ],
+                "tags": [ "escribe", "consola" ],
+                "samples": [ "escribe en la consola" ],
                 "cmd": "WRT-B",
                 "response":"se ha escrito en la consola" 
+            }
+        }
+    },
+    "en": {
+        "name": "assistant",
+        "requests": {
+            "time_hour": {
+                "type": "hour",
+                "tags": [ "time", "is" ],
+                "samples": [],
+                "response":"it is {}" 
+            },
+            "lights_off": {
+                "type": "command",
+                "tags": [ "turn", "off", "lights" ],
+                "samples": [ "turn off the lights" ],
+                "cmd": "D-SHT-L",
+                "response":"lights off" 
+            },
+            "lights_on": {
+                "type": "command",
+                "tags": [ "turn", "on", "lights" ],
+                "samples": [ "turn on the lights" ],
+                "cmd": "D-STT-L",
+                "response":"lights on" 
+            },
+            "write_board": {
+                "type": "command",
+                "tags": [ "write", "console" ],
+                "samples": [ "write to the console" ],
+                "cmd": "WRT-B",
+                "response":"it has been written to the console" 
             }
         }
     }

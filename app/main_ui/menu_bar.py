@@ -1,35 +1,48 @@
 from tkinter import *
 from tkinter import messagebox
 from config.config import Config
+from config.translations import Translations
 from main_ui.list_boxes import ListBoxes
 from .calendar_picker import *
 from .utils import *
 from .aggregate_popup import *
 
 class MenuBar:
-    def __init__(self, window: Tk, custom_config: Config) :
+    def __init__(self, window: Tk, custom_config: Config, translations: Translations) :
         self.__window = window
         self.__l_boxes:ListBoxes = None
         self.__custom_config = custom_config
+        self.__translations = translations
+        self.__menubar = Menu(self.__window, foreground='black', activebackground='white', 
+            activeforeground='black')  
+        self.load_menu()
 
-        verbose = BooleanVar()
-        verbose.set(False)
+    def load_menu(self):
+        verbose = BooleanVar(value=False)
         # Function for enabling or disabling context information in hud view
         def enableVerbose() :
-            if verbose.get() == 1: self.__custom_config.setVerbose(True)
-            elif verbose.get() == 0: self.__custom_config.setVerbose(False)
+            self.__custom_config.setVerbose(bool(verbose.get()))
 
-        darkmode = BooleanVar()
-        darkmode.set(False)
-        # Function for displaying UI components as dark or light
-        def darkMode():
-            if darkmode.get() == 1: self.__window.config(background='black')
-            elif darkmode.get() == 0: self.__window.config(background='white')
-            else: messagebox.showerror('Error', 'Something went wrong!')
-
-        self.__menubar = Menu(self.__window, foreground='black', activebackground='white', activeforeground='black')  
-
-        optionsm = Menu(self.__menubar, tearoff=0, foreground='black') 
+        def wrong_context1():
+            messagebox.showwarning(
+                self.get_translation('WrCont'), 
+                self.get_translation('WrContInfo1')
+            ) 
+        def wrong_context2():
+            messagebox.showwarning(
+                self.get_translation('WrCont'), 
+                self.get_translation('WrContInfo2')
+            ) 
+        def miss_context1():
+            messagebox.showwarning(
+                self.get_translation('MissCont'), 
+                self.get_translation('MissContInfo1')
+            )
+        def miss_context2():
+            messagebox.showwarning(
+                self.get_translation('MissCont'), 
+                self.get_translation('MissContInfo2')
+            )
         
         # Function for openning the simulator
         def genDatasets():
@@ -44,19 +57,20 @@ class MenuBar:
                     flag = startGenData(
                         self.__l_boxes.getLEscenarios().get(
                             self.__l_boxes.getLEscenarios().curselection()[0]), 
-                        dt, 
-                        self.__custom_config
+                        dt, self.__custom_config
                     )
-                    if not flag: messagebox.showwarning('Wrong context', 
-                        'The selected context does not refer to a blender file') 
-            else: 
-                messagebox.showwarning('Missing context', 
-                    'A context must be chosen')
+                    if not flag: wrong_context1()
+            else: miss_context1()
+                
             # Update list boxes
             self.__l_boxes.update()
             # Show main window
-            window.deiconify()
-        optionsm.add_command(label='Generate datasets', command=genDatasets)  
+            self.__window.deiconify()
+        
+        optionsm = Menu(self.__menubar, tearoff=0, foreground='black') 
+        
+        optionsm.add_command(label=self.get_translation('DataGen'), 
+            command=genDatasets)  
         # Function for openning the simulator in interactive mode
         def interactiveMode():
             if len(self.__l_boxes.getLEscenarios().curselection())!=0:
@@ -65,26 +79,22 @@ class MenuBar:
                 if selection in self.__custom_config.getInteractive():
                     # Hide main window
                     self.__window.withdraw()
-                    flag = startIntMode(
-                        selection, 
-                        self.__custom_config
-                    )
-                    if not flag: messagebox.showwarning('Wrong context', 
-                        'The selected context does not refer to a blender file') 
-                else: messagebox.showwarning('Wrong context', 
-                        'The selected context does not support interactive mode') 
-            else: 
-                messagebox.showwarning('Missing context', 
-                    'A context must be chosen')
+                    flag = startIntMode(selection, self.__custom_config)
+                    if not flag: wrong_context1()
+                else: wrong_context2()
+            else: miss_context1()
             # Update list boxes
             self.__l_boxes.update()
             # Show main window
-            window.deiconify()
-        optionsm.add_command(label='Interactive mode', command=interactiveMode)  
+            self.__window.deiconify()
+        optionsm.add_command(label=self.get_translation('IntMode'), 
+            command=interactiveMode)  
         optionsm.add_separator()
-        optionsm.add_command(label="Exit", command=window.quit)  
-        self.__menubar.add_cascade(label="Options", menu=optionsm)  
-
+        optionsm.add_command(label=self.get_translation('Exit'), 
+            command=self.__window.quit)  
+        self.__menubar.add_cascade(label=self.get_translation('Simulation'), 
+            menu=optionsm)  
+        
         toolsm = Menu(self.__menubar, tearoff=0)  
         def replicateDS():
             l_aux = []
@@ -96,27 +106,55 @@ class MenuBar:
                 self.__window.wait_window(agP)
                 # Update list boxes
                 self.__l_boxes.update()
-            else: 
-                messagebox.showwarning('Missing contexts', 
-                    'No context avilable')
-        toolsm.add_command(label="Replicate datasets", command=replicateDS) 
-        self.__menubar.add_cascade(label="Tools", menu=toolsm)  
+            else: miss_context2()
+        toolsm.add_command(label=self.get_translation('RepData'), 
+            command=replicateDS) 
+        self.__menubar.add_cascade(label=self.get_translation('Tools'), 
+            menu=toolsm)  
 
         configm = Menu(self.__menubar, tearoff=0)
-        configm.add_checkbutton(label='Enable verbose', onvalue=1, offvalue=0, variable=verbose, command=enableVerbose)
-        self.__menubar.add_cascade(label="Config", menu=configm)
+        configm.add_checkbutton(label=self.get_translation('EnVerb'), 
+            onvalue=1, offvalue=0, variable=verbose, command=enableVerbose)
+        self.__menubar.add_cascade(label=self.get_translation('Config'), 
+            menu=configm)
 
-        viewm = Menu(self.__menubar, tearoff=0)
-        viewm.add_checkbutton(label='Darkmode', onvalue=1, offvalue=0, variable=darkmode, command=darkMode)
-        self.__menubar.add_cascade(label='View', menu=viewm)
+        lang_men = Menu(self.__menubar, tearoff=0)
+        # Function for displaying info
+        def change_lang_to_es(): 
+            self.__custom_config.setLanguage('es')
+            self.__custom_config.save()
+            self.reload()
+        def change_lang_to_en(): 
+            self.__custom_config.setLanguage('en')
+            self.__custom_config.save()
+            self.reload()
+        lang_men.add_command(label=self.get_translation('es'), 
+            command=change_lang_to_es)  
+        lang_men.add_command(label=self.get_translation('en'), 
+            command=change_lang_to_en)  
+        self.__menubar.add_cascade(label=self.get_translation('Lang'), 
+            menu=lang_men) 
 
         help = Menu(self.__menubar, tearoff=0)
-
         # Function for displaying info
-        def about(): messagebox.showinfo('Info', '...')
-        help.add_command(label="About", command=about)  
-        self.__menubar.add_cascade(label="Help", menu=help)  
-        
+        def about(): messagebox.showinfo(
+            self.get_translation('Info'), 
+            self.get_translation('Info1'))
+        help.add_command(label=self.get_translation('Info'), command=about)  
+        self.__menubar.add_cascade(label=self.get_translation('Help'), 
+            menu=help)  
+
+    def get_translation(self, key:str) -> str:
+        return self.__translations.get_translation(key, 
+            self.__custom_config.getLanguage())
+
+    def clean(self):
+        self.__menubar.delete(0, 5)
+
+    def reload(self):
+        self.clean()
+        self.load_menu()
+    
     def getMenuBar(self):
         return self.__menubar
 

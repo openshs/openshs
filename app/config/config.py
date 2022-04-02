@@ -48,7 +48,7 @@ class Config:
     """
         Update the language parameter
     """
-    def setLanguage(self, lg: int):
+    def setLanguage(self, lg: str):
         self.language = lg
 
     """

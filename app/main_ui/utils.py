@@ -60,9 +60,12 @@ def startGenData(context, date_time, custom_config: Config):
     custom_config.save()
     
     bl_file = os.path.join('blender',context+'.blend')
-    if not os.path.isfile(bl_file): return False 
+    if not os.path.isfile(bl_file): return False
+    
+    assistant = Assistant(custom_config.getLanguage()); assistant.start()
     subprocess.call(["blender", bl_file], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, 
         shell=False)
+    assistant.end()
     
     # After the simulation is complete, data stored in the output.csv file must be saved
     count = 0
@@ -92,7 +95,7 @@ def startIntMode(context, custom_config: Config):
     bl_file = os.path.join('blender',context+'.blend')
     if not os.path.isfile(bl_file): return False 
 
-    assistant = Assistant(); assistant.start()
+    assistant = Assistant(custom_config.getLanguage()); assistant.start()
     subprocess.call(["blender", bl_file], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, 
         shell=False)
     assistant.end()
