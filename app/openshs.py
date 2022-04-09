@@ -41,15 +41,6 @@ def main():
     except: 
         messagebox.showerror('Error','No blender found on the system')
         exit()
-
-    try:
-        with subprocess.Popen(['python','--version'], stdout=subprocess.PIPE, universal_newlines=True) as process:
-            if 'Python 3' not in process.stdout.readline():
-                messagebox.showerror('Error','Python 3 must be used')
-                sys.exit()
-    except: 
-        messagebox.showerror('Error','No python found on the system')
-        exit()
     
     try: root.destroy()
     except: pass
