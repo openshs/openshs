@@ -1,4 +1,4 @@
 *.pyc
 *.blend1
-app/temp/tmp.mp3
-app/temp/output.csv
+*/tmp.mp3
+*/output.csv
