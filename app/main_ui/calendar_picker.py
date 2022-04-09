@@ -1,15 +1,19 @@
 from tkinter import *
 from tkcalendar import *
 from datetime import datetime
+from config.translations import Translations
+from config.config import Config
 
 class DateTimePicker(Toplevel):
-   def __init__(self, root) :
+   def __init__(self, root, config : Config, translations : Translations) :
       super().__init__(root)
+      self.__custom_config = config
+      self.__translations = translations
       # Modal popup
       self.transient(root)
       self.grab_set()
       self.focus_set()
-      self.title("DateTime Picker")
+      self.title(self.get_translation('DateTimePic'))
       self.geometry("360x350")
       self.resizable(width=False, height=False)
       
@@ -17,7 +21,7 @@ class DateTimePicker(Toplevel):
       self.date = None
       self.time = None
 
-      label1 = Label(self, text="Choose date:")
+      label1 = Label(self, text=self.get_translation('ChDate'))
       label1.place(x=150, y=10)
 
       # Date  Picker:
@@ -40,7 +44,7 @@ class DateTimePicker(Toplevel):
          self.cancel = False
          self.destroy()
 
-      label2 = Label(self, text="Choose time (hours | minutes | seconds):")
+      label2 = Label(self, text=self.get_translation('ChTime'))
       label2.place(x=70, y=240)
 
       self.hourstr = StringVar(self,datetime.now().hour)
@@ -79,3 +83,10 @@ class DateTimePicker(Toplevel):
          if self.last_value == "59":
             self.hourstr.set(int(self.hourstr.get())+1 if self.hourstr.get() !="23" else 0)            
       self.last_valueSec = self.secstr.get()
+
+   """
+      A shortcut for the translations.get_translations
+   """
+   def get_translation(self, key:str) -> str:
+      return self.__translations.get_translation(key, 
+         self.__custom_config.getLanguage())

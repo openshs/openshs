@@ -3,16 +3,20 @@ from tkinter.ttk import Progressbar
 from click import progressbar
 from tkcalendar import *
 from datetime import datetime
-from .utils import *
+from main_ui.utils import *
+from config.translations import Translations
+from config.config import Config
 
 class AgreggatePopup(Toplevel):
-   def __init__(self, root, contexts) :
+   def __init__(self, root, contexts, config : Config, translations : Translations) :
       super().__init__(root)
+      self.__custom_config = config
+      self.__translations = translations
       # Modal popup
       self.transient(root)
       self.grab_set()
       self.focus_set()
-      self.title("Aggregate Datasets")
+      self.title(self.get_translation('AggData'))
       self.geometry("340x370")
       self.resizable(width=False, height=False)
       
@@ -22,7 +26,7 @@ class AgreggatePopup(Toplevel):
       self.margin = None
       self.is_var = False
 
-      label1 = Label(self, text="Choose date:")
+      label1 = Label(self, text=self.get_translation('ChDate'))
       label1.place(x=130, y=10)
 
       # Date  Picker:
@@ -33,10 +37,10 @@ class AgreggatePopup(Toplevel):
       )
       cal.place(x=40, y=40)
 
-      label2 = Label(self, text="Number of days:")
+      label2 = Label(self, text=self.get_translation("NumDays"))
       label2.place(x=70, y=240)
 
-      label3 = Label(self, text="Margin minutes:")
+      label3 = Label(self, text=self.get_translation('MarMinutes'))
       label3.place(x=70, y=270)
       
       self.daysstr = StringVar(self, 1)
@@ -52,7 +56,8 @@ class AgreggatePopup(Toplevel):
       def changeVar():
          if (var1.get() == 0): self.is_var = False
          else: self.is_var = True
-      Checkbutton(self, text='Variable Activities',variable=var1, onvalue=1, offvalue=0, command=changeVar)\
+      Checkbutton(self, text=self.get_translation('VarAct'),variable=var1, onvalue=1, offvalue=0, 
+         command=changeVar)\
          .place(x=120, y=300)
 
       self.progress_bar = Progressbar(self, orient=HORIZONTAL, length=160, mode='determinate')
@@ -79,3 +84,10 @@ class AgreggatePopup(Toplevel):
       
       button2= Button(self, text= "Cancel", command = self.destroy)
       button2.place(x=250, y=340)
+      
+   """
+      A shortcut for the translations.get_translations
+   """
+   def get_translation(self, key:str) -> str:
+      return self.__translations.get_translation(key, 
+         self.__custom_config.getLanguage())

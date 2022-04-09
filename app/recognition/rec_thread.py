@@ -9,7 +9,7 @@ import json
 import traceback
 
 class Assistant(threading.Thread):
-    def __init__(self, lang : str = 'es'):
+    def __init__(self, timer : int, lang : str = 'es'):
         super().__init__(
             name="simulator_assistant_thread", 
             target=self.run
@@ -18,6 +18,7 @@ class Assistant(threading.Thread):
             self.recognizer = sr.Recognizer()
             self.keep_running = True
             self.language = lang
+            self.time = timer
             path = os.path.join('config','recognition.json')
             # Reading current recognition.json
             with open(path, "r") as json_file:
@@ -166,7 +167,7 @@ class Assistant(threading.Thread):
                     if 'response' in requests[req]:
                         if requests[req]['type'] == 'hour':
                             self.say(requests[req]['response']\
-                                .format(datetime.now().strftime('%H:%M')))
+                                .format(datetime.fromtimestamp(self.time).strftime('%H:%M')))
                         else:
                             self.say(requests[req]['response'])
                     return

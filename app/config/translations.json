@@ -35,6 +35,10 @@
         "es": "Contextos",
         "en": "Contexts"
     },
+    "Datasets": {
+        "es": "Sets de datos",
+        "en": "Datasets"
+    },
     "DataGen": {
         "es": "Generación de datos",
         "en": "Datasets generation"
@@ -47,6 +51,14 @@
         "es": "Replicar datos",
         "en": "Replicate datasets"
     },
+    "AddContext": {
+        "es": "Añadir contexto",
+        "en": "Add context"
+    },
+    "RmContext": {
+        "es": "Eliminar contexto",
+        "en": "Remove context"
+    },
     "EnVerb": {
         "es": "Habilitar verbosidad",
         "en": "Enable verbose"
@@ -56,12 +68,20 @@
         "en": "Info"
     },
     "Info1": {
-        "es": "...",
-        "en": "..."
+        "es": "Para probar una de los contextos que ofrece el simulador primero debes seleccionar uno de los contextos, luego en el menu de 'Simulación' seleccione la opción de 'Modo interactivo', si desea generar set de datos seleccione la opción 'Generación de datos'.\n\nEn la opción de 'Replicar datos' se utiliza un algoritmo que aumenta el tamaño de un sets de datos para que tenga mayor utilidad en entrenamiento. ",
+        "en": "To test one of the contexts offered by the simulator you must first select one of the contexts, then in the 'Simulation' menu select the option of 'Interactive mode', if you want to generate datasets select the option 'Datasets generation'.\n\nIn the 'Replicate datasets' option, an algorithm is used that increases the size of a dataset so that it has greater utility in training."
     },
     "MissCont": {
         "es": "Falta contexto",
         "en": "Missing context"
+    },
+    "IsInt": {
+        "es": "Contexto interactivo",
+        "en": "Interactive context"
+    },
+    "IsIntInfo1": {
+        "es": "¿Es un contexto interactivo?",
+        "en": "Is it an interactive context?"
     },
     "MissContInfo1": {
         "es": "Debes escoger un contexto",
@@ -87,6 +107,10 @@
         "es": "Datos agregados",
         "en": "Aggregate datasets"
     },
+    "ChContext": {
+        "es": "Escoge un contexto:",
+        "en": "Choose a context:"
+    },
     "ChDate": {
         "es": "Escoge una fecha:",
         "en": "Choose date:"
@@ -94,6 +118,10 @@
     "ChTime": {
         "es": "Escoge el horario (horas | minutos | segundos):",
         "en": "Choose time (hours | minutes | seconds):"
+    },
+    "DateTimePic": {
+        "es": "Selector de fecha y horario:",
+        "en": "DateTime Picker:"
     },
     "NumDays": {
         "es": "Número de días:",
@@ -136,6 +164,30 @@
     "OpFridge": {
         "es": "¿Abrir nevera?",
         "en": "Open fridge?"
+    },
+    "ClDoor": {
+        "es": "¿Cerrar puerta?",
+        "en": "Close door?"
+    },
+    "OpDoor": {
+        "es": "¿Abrir puerta?",
+        "en": "Open door?"
+    },
+    "OpWardrobe": {
+        "es": "¿Abrir armario?",
+        "en": "Open wardrobe?"
+    },
+    "ClWardrobe": {
+        "es": "¿Cerrar armario?",
+        "en": "Close wardrobe?"
+    },
+    "UnDoor": {
+        "es": "¿Desbloquear puerta?",
+        "en": "Unlock door?"
+    },
+    "LkDoor": {
+        "es": "¿Bloquear puerta?",
+        "en": "Lock door?"
     },
     "OnBedLamp": {
         "es": "¿Encender lámpara?",

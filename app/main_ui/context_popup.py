@@ -2,9 +2,14 @@ from tkinter import *
 import os
 from tkinter import messagebox
 
+from config.translations import Translations
+from config.config import Config
+
 class ContextPopup(Toplevel):
-    def __init__(self, root: Tk):
+    def __init__(self, root: Tk, config : Config, translations : Translations):
         super().__init__(root)
+        self.__custom_config = config
+        self.__translations = translations
         # Modal popup
         self.transient(root)
         self.grab_set()
@@ -17,7 +22,7 @@ class ContextPopup(Toplevel):
         self.grid_columnconfigure(0,weight=1)
         self.grid_rowconfigure(1,weight=1)
         #------------------------------------------------------------------------
-        label = Label(self, text="Choose a context:")
+        label = Label(self, text=self.get_translation("ChContext"))
         label.grid(column=0,row=0, padx=(30, 0), pady=(10, 0), sticky='NSWE')
 
         #------------------------------------------------------------------------
@@ -41,8 +46,9 @@ class ContextPopup(Toplevel):
                 self.cancel = False
                 self.destroy()
             else:
-                messagebox.showwarning('Missing context', 
-                    'A context must be chosen')
+                messagebox.showwarning(
+                    self.get_translation("MissCont"), 
+                    self.get_translation("MissContInfo1"))
         button1= Button(self, text= "Accept", command = get_data)
         button1.grid(column=0,row=3, padx=(200, 0), pady=(0, 20), sticky='NW')
         button2= Button(self, text= "Cancel", command = self.destroy)
@@ -61,3 +67,10 @@ class ContextPopup(Toplevel):
                 and not f.lower().startswith('apartment'):
                 context = f.replace('.blend','')
                 self.l_scnearios.insert(1, context)
+
+    """
+        A shortcut for the translations.get_translations
+    """
+    def get_translation(self, key:str) -> str:
+        return self.__translations.get_translation(key, 
+            self.__custom_config.getLanguage())

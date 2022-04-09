@@ -1,4 +1,4 @@
-import os.path
+import os
 import json
 from datetime import datetime
 
@@ -79,13 +79,26 @@ class Config:
         Get the contexts parameter
     """
     def getContexts(self):
-        return self.contexts
+        res = []
+        for context in self.contexts:
+            if context+'.blend' in os.listdir('blender'):
+                res.append(context)
+        return res
 
     """
         Add a new context
     """
-    def addContexts(self, cnt: str):
+    def addContext(self, cnt: str):
         self.contexts.append(cnt)
+
+    """
+        Remove a context
+    """
+    def rmContext(self, cnt: str):
+        if cnt in self.contexts:
+            self.contexts.remove(cnt)
+            if cnt in self.interactive:
+                self.interactive.remove(cnt)
 
     """
         Get the interactive contexts parameter

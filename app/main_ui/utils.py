@@ -62,7 +62,7 @@ def startGenData(context, date_time, custom_config: Config):
     bl_file = os.path.join('blender',context+'.blend')
     if not os.path.isfile(bl_file): return False
     
-    assistant = Assistant(custom_config.getLanguage()); assistant.start()
+    assistant = Assistant(int(start_dt.timestamp()), custom_config.getLanguage()); assistant.start()
     subprocess.call(["blender", bl_file], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, 
         shell=False)
     assistant.end()
@@ -95,7 +95,7 @@ def startIntMode(context, custom_config: Config):
     bl_file = os.path.join('blender',context+'.blend')
     if not os.path.isfile(bl_file): return False 
 
-    assistant = Assistant(custom_config.getLanguage()); assistant.start()
+    assistant = Assistant(custom_config.getStartTime(), custom_config.getLanguage()); assistant.start()
     subprocess.call(["blender", bl_file], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, 
         shell=False)
     assistant.end()

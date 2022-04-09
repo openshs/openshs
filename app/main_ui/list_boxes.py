@@ -1,21 +1,25 @@
 from tkinter import *
 import os
 from config.config import Config
+from config.translations import Translations
 
 class ListBoxes:
-    def __init__(self, window: Tk, custom_config: Config):
+    def __init__(self, window: Tk, custom_config: Config, translations : Translations):
         self.__window = window
         self.__custom_config = custom_config
+        self.__translations = translations
         
         #------------------------------------------------------------------------
-        label = Label(self.__window, text="Contexts:")
-        label.config(font=("Times New Roman",14))
-        label.grid(column=0,row=0, padx=(30, 0), pady=(10, 0), sticky='NSWE')
+        self.__label1 = Label(self.__window, 
+            text=self.get_translation("Contexts")+":")
+        self.__label1.config(font=("Times New Roman",14))
+        self.__label1.grid(column=0,row=0, padx=(30, 0), pady=(10, 0), sticky='NSWE')
 
         #------------------------------------------------------------------------
-        label = Label(self.__window, text="Datasets:")
-        label.config(font=("Times New Roman",14))
-        label.grid(column=2,row=0, padx=(15, 0), pady=(10, 0), sticky='NSWE')
+        self.__label2 = Label(self.__window, 
+            text=self.get_translation("Datasets")+":")
+        self.__label2.config(font=("Times New Roman",14))
+        self.__label2.grid(column=2,row=0, padx=(15, 0), pady=(10, 0), sticky='NSWE')
         
         #------------------------------------------------------------------------
         scroll_sc1 = Scrollbar(self.__window, orient=VERTICAL)
@@ -63,3 +67,14 @@ class ListBoxes:
             if os.path.isfile(os.path.join('data', f)) and f.lower().endswith('.csv') :
                 data = f.replace('.csv','')
                 self.__l_datast.insert(1, data)
+    
+    def reload(self):
+        self.__label1.config(text=self.get_translation("Contexts")+":")
+        self.__label2.config(text=self.get_translation("Datasets")+":")
+    
+    """
+        A shortcut for the translations.get_translations
+    """
+    def get_translation(self, key:str) -> str:
+        return self.__translations.get_translation(key, 
+            self.__custom_config.getLanguage())

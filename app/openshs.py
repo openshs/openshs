@@ -25,7 +25,7 @@ class MainUi(Tk):
         self.grid_columnconfigure(0, weight=1)
         self.grid_columnconfigure(2, weight=1)
         self.grid_rowconfigure(1, weight=1)
-        l_boxes = ListBoxes(self, custom_config)
+        l_boxes = ListBoxes(self, custom_config, translations)
 
         # MenuBar can make changes to ListBoxes
         self.__menu.setListBoxes(l_boxes)
