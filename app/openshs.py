@@ -40,7 +40,7 @@ def main():
                 sys.exit()
     except: 
         messagebox.showerror('Error','No blender found on the system')
-        exit()
+        sys.exit()
     
     try: root.destroy()
     except: pass
