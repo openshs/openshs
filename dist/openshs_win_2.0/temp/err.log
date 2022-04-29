@@ -1,4 +1,0 @@
-Traceback (most recent call last):
-  File "check_lights.py", line 42, in testLights
-AttributeError: module 'GameLogic' has no attribute 'states'
-{'bedroomLight': 0, 'hallwayLight': 0, 'kitchenLight': 0, 'livingLight': 0, 'officeLight': 0, 'bathroomLight': 0}

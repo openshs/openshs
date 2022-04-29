@@ -1,0 +1,15 @@
+{
+    "language": "es",
+    "start_time": 1651255200,
+    "verbose": false,
+    "contexts": [
+        "morning",
+        "evening",
+        "afternoon"
+    ],
+    "interactive": [
+        "morning",
+        "evening",
+        "afternoon"
+    ]
+}

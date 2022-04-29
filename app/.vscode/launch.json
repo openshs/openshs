@@ -9,7 +9,7 @@
             "name": "Python: Archivo actual",
             "type": "python",
             "request": "launch",
-            "program": "openshs.py",
+            "program": "ui.py",
             "console": "integratedTerminal",
             "justMyCode": true
         }

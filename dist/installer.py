@@ -3,6 +3,7 @@ import sys
 import os
 import shutil
 
+# Remove temporary directories
 if os.path.exists("app"): shutil.rmtree("app")
 if os.path.exists("build"): shutil.rmtree("build")
 if os.path.exists("dist"): shutil.rmtree("dist")
@@ -16,18 +17,13 @@ if subprocess.call('pyinstaller --clean --noconfirm --onefile --windowed --icon 
 if os.path.exists("build"): shutil.rmtree("build")
 
 for root, dirs, files in os.walk("app"):
-    for file in files:
-        file = os.path.join(root, file)
-        if ".py" in file and not "blender" in file: os.remove(file)
+    #for file in files:
+    #    file = os.path.join(root, file)
+    #    if ".py" in file and not "blender" in file: os.remove(file)
     for dir in dirs:
         if dir.endswith('__pycache__'):
             dir = os.path.join(root, dir)
             shutil.rmtree(dir)
-
-if os.path.exists(os.path.join("app","main_ui")): 
-    shutil.rmtree(os.path.join("app","main_ui"))
-if os.path.exists(os.path.join("app","repeater")): 
-    shutil.rmtree(os.path.join("app","repeater"))
 
 for root, dirs, files in os.walk("dist"):
     for file in files:
