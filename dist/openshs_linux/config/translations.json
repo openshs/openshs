@@ -1,0 +1,248 @@
+{
+    "es": {
+        "es": "español",
+        "en": "spanish"
+    },
+    "en": {
+        "es": "ingles",
+        "en": "english"
+    },
+    "Simulation": {
+        "es": "Simulación",
+        "en": "Simulation"
+    },
+    "Tools": {
+        "es": "Herramientas",
+        "en": "Tools"
+    },
+    "Config": {
+        "es": "Configuración",
+        "en": "Config"
+    },
+    "Lang": {
+        "es": "Idioma",
+        "en": "Language"
+    },
+    "Help": {
+        "es": "Ayuda",
+        "en": "Help"
+    },
+    "Exit": {
+        "es": "Salir",
+        "en": "Exit"
+    },
+    "Contexts": {
+        "es": "Contextos",
+        "en": "Contexts"
+    },
+    "Datasets": {
+        "es": "Sets de datos",
+        "en": "Datasets"
+    },
+    "DataGen": {
+        "es": "Generación de datos",
+        "en": "Datasets generation"
+    },
+    "IntMode": {
+        "es": "Modo interactivo",
+        "en": "Interactive mode"
+    },
+    "RepData": {
+        "es": "Replicar datos",
+        "en": "Replicate datasets"
+    },
+    "AddContext": {
+        "es": "Añadir contexto",
+        "en": "Add context"
+    },
+    "RmContext": {
+        "es": "Eliminar contexto",
+        "en": "Remove context"
+    },
+    "EnVerb": {
+        "es": "Habilitar verbosidad",
+        "en": "Enable verbose"
+    },
+    "Info": {
+        "es": "Información",
+        "en": "Info"
+    },
+    "Info1": {
+        "es": "Para probar una de los contextos que ofrece el simulador primero debes seleccionar uno de los contextos, luego en el menu de 'Simulación' seleccione la opción de 'Modo interactivo', si desea generar set de datos seleccione la opción 'Generación de datos'.\n\nEn la opción de 'Replicar datos' se utiliza un algoritmo que aumenta el tamaño de un sets de datos para que tenga mayor utilidad en entrenamiento. ",
+        "en": "To test one of the contexts offered by the simulator you must first select one of the contexts, then in the 'Simulation' menu select the option of 'Interactive mode', if you want to generate datasets select the option 'Datasets generation'.\n\nIn the 'Replicate datasets' option, an algorithm is used that increases the size of a dataset so that it has greater utility in training."
+    },
+    "MissCont": {
+        "es": "Falta contexto",
+        "en": "Missing context"
+    },
+    "IsInt": {
+        "es": "Contexto interactivo",
+        "en": "Interactive context"
+    },
+    "IsIntInfo1": {
+        "es": "¿Es un contexto interactivo?",
+        "en": "Is it an interactive context?"
+    },
+    "MissContInfo1": {
+        "es": "Debes escoger un contexto",
+        "en": "A context must be chosen"
+    },
+    "MissContInfo2": {
+        "es": "No hay contextos disponibles",
+        "en": "No context avilable"
+    },
+    "WrCont": {
+        "es": "Contexto incorrecto",
+        "en": "Wrong context"
+    },
+    "WrContInfo1": {
+        "es": "El contexto seleccionado no se relaciona con un fichero blender",
+        "en": "The selected context does not refer to a blender file"
+    },
+    "WrContInfo2": {
+        "es": "El contexto seleccionado no soporta el modo interactivo",
+        "en": "The selected context does not support interactive mode"
+    },
+    "AggData": {
+        "es": "Datos agregados",
+        "en": "Aggregate datasets"
+    },
+    "ChContext": {
+        "es": "Escoge un contexto:",
+        "en": "Choose a context:"
+    },
+    "ChDate": {
+        "es": "Escoge una fecha:",
+        "en": "Choose date:"
+    },
+    "ChTime": {
+        "es": "Escoge el horario (horas | minutos | segundos):",
+        "en": "Choose time (hours | minutes | seconds):"
+    },
+    "DateTimePic": {
+        "es": "Selector de fecha y horario:",
+        "en": "DateTime Picker:"
+    },
+    "NumDays": {
+        "es": "Número de días:",
+        "en": "Number of days:"
+    },
+    "MarMinutes": {
+        "es": "Minutos de margen:",
+        "en": "Margin minutes:"
+    },
+    "VarAct": {
+        "es": "Actividades variables",
+        "en": "Variable activities"
+    },
+    "Accept": {
+        "es": "Aceptar",
+        "en": "Accept"
+    },
+    "Cancel": {
+        "es": "Cancelar",
+        "en": "Cancel"
+    },
+
+
+    "GetUp": {
+        "es": "¿Levantarse?",
+        "en": "Get up?"
+    },
+    "LayDown": {
+        "es": "¿Acostarse?",
+        "en": "Lay down?"
+    },
+    "SitDown": {
+        "es": "¿Sentarse?",
+        "en": "Sit down?"
+    },
+    "ClFridge": {
+        "es": "¿Cerrar nevera?",
+        "en": "Close fridge?"
+    },
+    "OpFridge": {
+        "es": "¿Abrir nevera?",
+        "en": "Open fridge?"
+    },
+    "ClDoor": {
+        "es": "¿Cerrar puerta?",
+        "en": "Close door?"
+    },
+    "OpDoor": {
+        "es": "¿Abrir puerta?",
+        "en": "Open door?"
+    },
+    "OpWardrobe": {
+        "es": "¿Abrir armario?",
+        "en": "Open wardrobe?"
+    },
+    "ClWardrobe": {
+        "es": "¿Cerrar armario?",
+        "en": "Close wardrobe?"
+    },
+    "UnDoor": {
+        "es": "¿Desbloquear puerta?",
+        "en": "Unlock door?"
+    },
+    "LkDoor": {
+        "es": "¿Bloquear puerta?",
+        "en": "Lock door?"
+    },
+    "OnBedLamp": {
+        "es": "¿Encender lámpara?",
+        "en": "Turn the lamp on?"
+    },
+    "OffBedLamp": {
+        "es": "¿Apagar lámpara?",
+        "en": "Turn the lamp off?"
+    },
+    "OnAssistant": {
+        "es": "¿Encender el asistente?",
+        "en": "Turn the assistant on?"
+    },
+    "OffAssistant": {
+        "es": "¿Apagar el asistente?",
+        "en": "Turn the assistant off?"
+    },
+    "OnLht": {
+        "es": "¿Encender la luz?",
+        "en": "Turn the light on?"
+    },
+    "OffLht": {
+        "es": "¿Apagar la luz?",
+        "en": "Turn the light off?"
+    },
+    "OnLhtMap": {
+        "es": "¿Encender la luz del {}?",
+        "en": "Turn the {} light on?"
+    },
+    "OffLhtMap": {
+        "es": "¿Apagar la luz del {}?",
+        "en": "Turn the {} light off?"
+    },
+    "OfficeWork": {
+        "es": "¿Trabajar?",
+        "en": "Work?"
+    },
+    "OfficeStop": {
+        "es": "¿Dejar de trabajar?",
+        "en": "Stop working?"
+    },
+    "OffOven": {
+        "es": "¿Apagar el horno?",
+        "en": "Turn the oven off?"
+    },
+    "OnOven": {
+        "es": "¿Encender el horno?",
+        "en": "Turn the oven on?"
+    },
+    "OffTV": {
+        "es": "¿Apagar la TV?",
+        "en": "Turn the TV off?"
+    },
+    "OnTV": {
+        "es": "¿Encender la TV?",
+        "en": "Turn the TV on?"
+    }
+}
